@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VC Prepare Investor Briefing",
+  "description": "Structured investor briefing data. All fields are optional to support graceful degradation when data is unavailable.",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "Briefing metadata",
+      "properties": {
+        "generatedAt": { "type": "string", "description": "ISO 8601 timestamp" },
+        "dataSources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of data sources used, e.g. ['WebSearch', 'Exa', 'xAI']"
+        },
+        "companyContext": { "type": "boolean", "description": "Whether company context was provided" }
+      }
+    },
+    "investor": {
+      "type": "object",
+      "description": "Core investor profile",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string", "description": "Current title, e.g. 'General Partner'" },
+        "fund": { "type": "string", "description": "Current fund/firm name" },
+        "about": { "type": "string", "description": "1-2 sentence bio summary" },
+        "linkedin": { "type": "string" },
+        "twitter": { "type": "string" },
+        "website": { "type": "string", "description": "Personal blog or website" },
+        "fundSize": { "type": "string", "description": "e.g. '$300M fund'" },
+        "sweetSpot": { "type": "string", "description": "Typical check size, e.g. '$500K-$2M'" },
+        "stageFocus": { "type": "string", "description": "e.g. 'Pre-seed / Seed'" }
+      },
+      "required": ["name"]
+    },
+    "company": {
+      "type": "object",
+      "description": "The user's company context (if provided)",
+      "properties": {
+        "name": { "type": "string" },
+        "website": { "type": "string" },
+        "description": { "type": "string" },
+        "stage": { "type": "string" },
+        "raising": { "type": "string" }
+      }
+    },
+    "fitScore": {
+      "type": "object",
+      "description": "Fit assessment. Only present when company context was provided.",
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "explanation": { "type": "string", "description": "2-3 sentence justification" },
+        "thesisAlignment": { "type": "string" },
+        "portfolioPatternMatch": { "type": "string" },
+        "stageFit": { "type": "string" },
+        "checkSizeFit": { "type": "string" }
+      }
+    },
+    "career": {
+      "type": "array",
+      "description": "Career history, reverse-chronological. May be empty if data unavailable.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": { "type": "string" },
+          "company": { "type": "string" },
+          "startYear": { "type": "string" },
+          "endYear": { "type": "string", "description": "Year or 'present'" },
+          "note": { "type": "string", "description": "Key outcome, acquisition, or achievement" }
+        }
+      }
+    },
+    "education": {
+      "type": "array",
+      "description": "Education history. May be empty; many investors didn't finish or attend college.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "degree": { "type": "string" },
+          "institution": { "type": "string" },
+          "year": { "type": "string" }
+        }
+      }
+    },
+    "portfolio": {
+      "type": "array",
+      "description": "Portfolio companies. 6-10 most notable.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "company": { "type": "string" },
+          "stage": { "type": "string", "description": "Seed, Series A, etc." },
+          "categories": { "type": "array", "items": { "type": "string" } },
+          "date": { "type": "string", "description": "Investment date, e.g. 'Mar 2010'" },
+          "status": { "type": "string", "description": "Invested, Exited, IPO, Acquired" },
+          "note": { "type": "string", "description": "Optional: acquisition price, current valuation" }
+        }
+      }
+    },
+    "press": {
+      "type": "array",
+      "description": "Recent press, interviews, podcast appearances. May be empty.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "source": { "type": "string" },
+          "date": { "type": "string" },
+          "summary": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    "relevantContent": {
+      "type": "array",
+      "description": "Investor content relevant to the user's company. Only when company context exists.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string", "description": "Quote, tweet, or excerpt" },
+          "source": { "type": "string", "description": "@handle, blog, publication" },
+          "date": { "type": "string" },
+          "url": { "type": "string" },
+          "relevance": { "type": "string", "description": "Why this matters for the user's company" }
+        }
+      }
+    },
+    "recentTweets": {
+      "type": "array",
+      "description": "Recent tweets regardless of company relevance. May be empty if investor isn't active on X.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" },
+          "date": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    "gamePlan": {
+      "type": "object",
+      "description": "Meeting strategy",
+      "properties": {
+        "howTheyThink": { "type": "string", "description": "4-6 sentence investor evaluation style analysis" },
+        "connections": {
+          "type": "array",
+          "description": "Where you connect. 5 items.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "detail": { "type": "string" }
+            }
+          }
+        },
+        "predictedQuestions": {
+          "type": "array",
+          "description": "Questions they'll probably ask. 4-5 items.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": { "type": "string" },
+              "suggestedApproach": { "type": "string" }
+            }
+          }
+        },
+        "avoid": {
+          "type": "array",
+          "description": "Things NOT to say, based on anti-portfolio and known dislikes. 2-3 items.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "topic": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "otherInvestors": {
+      "type": "array",
+      "description": "3-4 similar investors to also pursue.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "fund": { "type": "string" },
+          "fit": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "why": { "type": "string" },
+          "talkingPoint": { "type": "string", "description": "Specific angle for outreach" },
+          "linkedin": { "type": "string" },
+          "twitter": { "type": "string" }
+        }
+      }
+    },
+    "quickReference": {
+      "type": "object",
+      "description": "Compact card for glancing at during the call",
+      "properties": {
+        "oneLinerThesis": { "type": "string" },
+        "oneLinerStyle": { "type": "string" },
+        "topQuestions": { "type": "array", "items": { "type": "string" }, "maxItems": 3 },
+        "proofPoints": { "type": "array", "items": { "type": "string" }, "maxItems": 3 },
+        "doNotSay": { "type": "string" }
+      }
+    }
+  },
+  "required": ["investor"]
+}

@@ -1,0 +1,8 @@
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="16" cy="12" r="5"/>
+  <path d="M8 30c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+  <line x1="30" y1="12" x2="42" y2="12"/>
+  <line x1="30" y1="20" x2="42" y2="20"/>
+  <line x1="30" y1="28" x2="38" y2="28"/>
+  <polyline points="30 36 33 39 40 32"/>
+</svg>

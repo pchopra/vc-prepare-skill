@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Log: VC Whisper Prepare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #92400e;
+    --accent-light: #b45309;
+    --accent-bg: #fffbeb;
+    --accent-bg-deep: #fef3c7;
+    --text: #1c1917;
+    --text-secondary: #57534e;
+    --text-muted: #a8a29e;
+    --border: #e7e5e4;
+    --border-accent: #d6d3d1;
+    --bg: #fafaf9;
+    --white: #ffffff;
+    --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(28, 25, 23, 0.07), 0 2px 4px -2px rgba(28, 25, 23, 0.05);
+  }
+
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 18px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(146, 64, 14, 0.3);
+    transition: border-color 0.15s;
+  }
+
+  a:hover {
+    border-bottom-color: var(--accent);
+  }
+
+  /* === HEADER === */
+
+  .header {
+    background: linear-gradient(135deg, #1c1917 0%, #292524 50%, #44403c 100%);
+    color: var(--white);
+    padding: 5rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at 20% 80%, rgba(146, 64, 14, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(180, 83, 9, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: 740px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #d97706;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .header-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: #d97706;
+  }
+
+  .header h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 3.2rem;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+  }
+
+  .header-meta {
+    font-size: 0.85rem;
+    color: #a8a29e;
+    line-height: 1.8;
+  }
+
+  .header-meta strong {
+    color: #d6d3d1;
+    font-weight: 500;
+  }
+
+  .header-meta a {
+    color: #d97706;
+    border-bottom-color: rgba(217, 119, 6, 0.3);
+  }
+
+  .header-meta a:hover {
+    border-bottom-color: #d97706;
+  }
+
+  .header-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+    margin: 1.5rem 0;
+  }
+
+  /* === MAIN CONTENT === */
+
+  .content {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+  }
+
+  .intro {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 3.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* === SECTIONS (timeline) === */
+
+  .section {
+    position: relative;
+    padding-left: 2.5rem;
+    margin-bottom: 3rem;
+    padding-bottom: 1rem;
+    break-inside: avoid;
+  }
+
+  .section::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--border));
+  }
+
+  .section:last-child::before {
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  .section-number {
+    position: absolute;
+    left: -11px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0;
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+
+  .section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    break-after: avoid;
+  }
+
+  .section p {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+  }
+
+  .section p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* === BLOCKQUOTES === */
+
+  blockquote {
+    margin: 1.25rem 0;
+    padding: 1rem 1.5rem;
+    background: var(--accent-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+    color: var(--accent);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    break-inside: avoid;
+  }
+
+  blockquote strong {
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* === LISTS === */
+
+  ul, ol {
+    margin: 0.75rem 0 1rem 1.25rem;
+    color: var(--text-secondary);
+  }
+
+  li {
+    margin-bottom: 0.35rem;
+    padding-left: 0.25rem;
+  }
+
+  li::marker {
+    color: var(--accent);
+  }
+
+  /* === INLINE ELEMENTS === */
+
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, monospace;
+    font-size: 0.82em;
+    background: #f5f5f4;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.15em 0.4em;
+    color: var(--accent-light);
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* === DETAIL CARD === */
+
+  .detail-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.25rem 0;
+    box-shadow: var(--shadow-sm);
+    break-inside: avoid;
+  }
+
+  .detail-card h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-card ul {
+    margin: 0;
+    list-style: none;
+    padding: 0;
+  }
+
+  .detail-card li {
+    padding: 0.3rem 0;
+    padding-left: 1rem;
+    position: relative;
+    margin: 0;
+  }
+
+  .detail-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.85em;
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  /* === APPROACH TABLE === */
+
+  .approach-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+  }
+
+  .approach {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s;
+    break-inside: avoid;
+  }
+
+  .approach.chosen {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  .approach-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+
+  .approach-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .approach-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .chosen-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: var(--white);
+    padding: 0.15em 0.6em;
+    border-radius: 3px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  /* === FOOTER === */
+
+  .footer {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* === PRINT === */
+
+  @media print {
+    html { font-size: 14px; }
+    body { background: white; }
+    .header { background: #1c1917 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section-number { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section { break-inside: avoid; }
+    blockquote { break-inside: avoid; }
+    .detail-card { break-inside: avoid; }
+    .approach { break-inside: avoid; }
+    h2 { break-after: avoid; }
+    .section-page-break { page-break-before: always; }
+  }
+
+  /* === RESPONSIVE === */
+
+  @media (max-width: 640px) {
+    html { font-size: 16px; }
+    .header { padding: 3rem 1.5rem 2.5rem; }
+    .header h1 { font-size: 2.2rem; }
+    .content { padding: 2rem 1.5rem 4rem; }
+    .section { padding-left: 2rem; }
+    .section-number { left: -11px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-label">Build Log</div>
+    <h1>Building VC Whisper Prepare<br>as a Claude Code Skill</h1>
+    <div class="header-divider"></div>
+    <div class="header-meta">
+      <strong>March 26, 2026</strong><br>
+      Conner Ruhl directing Claude Code via voice input (SuperWhisper)<br>
+      Single evening session, start to finish<br>
+      <a href="https://github.com/cruhl/vc-prepare">github.com/cruhl/vc-prepare</a>
+    </div>
+  </div>
+</header>
+
+<main class="content">
+
+  <p class="intro">
+    This is the raw build log of a Claude Code session. The entire thing was directed by voice
+    (SuperWhisper speech-to-text), so what follows is cleaned-up dictation, not polished
+    copywriting. The decisions are real, the quotes are real, the frustrations are real.
+    What follows is the chronological record of a single Claude Code session.
+  </p>
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-number">1</div>
+    <h2>The Spark <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">6:15 PM</span></h2>
+    <blockquote>
+      "I would, that's how I do literally everything nowadays. Custom CLI or skill.
+      Just ask Claude to make you the skill."
+    </blockquote>
+    <p>
+      Parth Chopra had just launched <strong>VC Whisper Prepare</strong>
+      (vcwhisper.com/prepare) and was interested in making it a Claude Code skill.
+      Rather than explain how skills work, Conner decided to just build it and hand
+      over the repo.
+    </p>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-number">2</div>
+    <h2>Research Phase <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">6:17 PM</span></h2>
+    <p>
+      Three parallel research agents launched simultaneously, each attacking a different axis
+      of the problem:
+    </p>
+    <div class="detail-card">
+      <h3>Parallel Research Agents</h3>
+      <ul>
+        <li>Scrape vcwhisper.com/prepare for the full site analysis</li>
+        <li>Research Claude Code skills documentation from Anthropic</li>
+        <li>Examine existing skills in <code>~/.claude/skills/</code> for patterns</li>
+      </ul>
+    </div>
+    <p>
+      The scraper found the complete API structure: <code>/api/prepare</code> for the main
+      analysis endpoint, <code>/api/prepare/search-investors</code> for autocomplete,
+      <code>/api/prepare/parse-deck</code> for PDF parsing, and <code>/api/prepare/veck-lookup</code>
+      for the investor database. Under the hood, the tech stack was Exa, Seedlist, xAI,
+      Browserbase, and (in Parth's words) "a lot of prompt engineering."
+    </p>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-number">3</div>
+    <h2>Architecture Decisions <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">6:25 PM</span></h2>
+    <p>Three approaches on the table:</p>
+    <div class="approach-grid">
+      <div class="approach">
+        <div class="approach-label">Approach A</div>
+        <div class="approach-title">Pure Skill with WebSearch Only</div>
+        <div class="approach-desc">
+          Zero configuration. Relies entirely on Claude's built-in web search.
+          Roughly 75% quality compared to the full product.
+        </div>
+      </div>
+      <div class="approach">
+        <div class="approach-label">Approach B</div>
+        <div class="approach-title">Wrap Parth's API</div>
+        <div class="approach-desc">
+          Identical quality to the web app. Hard dependency on Parth's service
+          staying up and maintaining the same endpoints.
+        </div>
+      </div>
+      <div class="approach chosen">
+        <div class="approach-label">Approach C <span class="chosen-badge">Chosen</span></div>
+        <div class="approach-title">Hybrid: WebSearch Default, API Keys Optional</div>
+        <div class="approach-desc">
+          Zero friction install that works immediately. Premium tier unlocked when users
+          add their own API keys for Exa, xAI, or Browserbase enrichment.
+        </div>
+      </div>
+    </div>
+    <p>
+      The decision was straightforward. Zero friction install by default, but if you have API keys,
+      you get the premium tier.
+    </p>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-number">4</div>
+    <h2>The Build <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">6:35 PM</span></h2>
+    <p>
+      A new git repo went up at <code>/Users/cruhl/GitHub/vc-prepare</code>.
+      The initial build produced four core files:
+    </p>
+    <ul>
+      <li><strong>SKILL.md</strong> with frontmatter, research instructions, and the output template</li>
+      <li><strong>README.md</strong> with install instructions, usage examples, and API key docs</li>
+      <li><strong>LICENSE</strong> (MIT, under Parth's name)</li>
+      <li>An example output for <strong>Paul Graham</strong></li>
+    </ul>
+    <p>
+      Pushed to GitHub as <code>cruhl/vc-prepare</code>. A functional skill, live, in one pass.
+      But nowhere near done.
+    </p>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section section-page-break">
+    <div class="section-number">5</div>
+    <h2>Feature Parity Audit <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">6:42 PM</span></h2>
+    <blockquote>
+      "I want another agent to strip-mine the website for a gigantic list of every functional
+      requirement and feature, how data is outputted, the formatting, etc. So that we can
+      adversarially prompt to make sure that we have complete feature parity."
+    </blockquote>
+    <p>
+      The skeleton was up, but there was no confidence it actually matched what Parth's web app
+      does. A dedicated agent launched to adversarially compare the skill's output against every
+      feature the web product offered.
+    </p>
+    <div class="detail-card">
+      <h3>Audit Results</h3>
+      <ul>
+        <li>9 input fields, 4 top-level output sections, 9 subsections</li>
+        <li>Complete data schema with all fields documented</li>
+        <li>Loading states, error handling, example data flow</li>
+        <li>Color palette, typography, and layout patterns</li>
+      </ul>
+    </div>
+    <p>
+      This became the specification for the next round of work. If the web product had it,
+      the skill needed to support it.
+    </p>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-number">6</div>
+    <h2>Architecture Overhaul <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">6:50 PM</span></h2>
+    <blockquote>
+      "Basically, if Claude writes the JSON, we should be able to have a perfect report
+      every time, and that's the sort of main final output. We should also have a beautiful
+      CLI output version of the same document in case they don't give a shit about the PDF."
+    </blockquote>
+    <p>
+      The initial build was functional but structurally naive. The pipeline needed to be
+      rethought from scratch. Conner's key insight: separate data from presentation entirely.
+    </p>
+    <ul>
+      <li><strong>JSON-first pipeline:</strong> Research produces structured JSON first, then the CLI
+        and PDF renderer consume it independently</li>
+      <li><strong>All fields optional:</strong> Graceful degradation when data is unavailable</li>
+      <li><strong>Parallel subagent research:</strong> Four agents (career, portfolio, tweets,
+        industry context) running simultaneously</li>
+      <li><strong><code>schema.json</code> as the single source of truth:</strong> One schema governs
+        the data contract across every layer</li>
+    </ul>
+    <p>
+      The first pass was a prototype. This was the product.
+    </p>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section section-page-break">
+    <div class="section-number">7</div>
+    <h2>The PDF Renderer <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">7:00 PM</span></h2>
+    <blockquote>
+      "Think $2,000 minimum paid report by a consultant who specializes in this activity."
+    </blockquote>
+    <p>
+      <code>render.py</code> came in at 1,200 lines of Python with a fully embedded HTML/CSS
+      template. The bar was set from the first sentence. Design choices included Cormorant Garamond
+      for headings, Source Serif for body text, Inter for labels, and a warm earth-tone palette
+      matching VC Whisper's existing aesthetic. Cover page with investor name, fit score badge,
+      and metadata.
+    </p>
+    <blockquote>
+      "We need no headers or footers when we actually output the PDF."
+    </blockquote>
+    <blockquote>
+      "The page breaks are not perfect. They need to be perfect. We cannot split stuff naively."
+    </blockquote>
+    <p>
+      The first version did not meet the standard:
+    </p>
+    <blockquote>
+      "It's just kind of an embarrassing level of Claude Code smelling mess at the moment.
+      Think about what we can improve and the best fit for print media."
+    </blockquote>
+    <p>
+      The conversion pipeline was built with a three-step cascade: try WeasyPrint first,
+      fall back to wkhtmltopdf, then Chrome headless as the last resort. Redundancy
+      over fragility.
+    </p>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section">
+    <div class="section-number">8</div>
+    <h2>API Verification <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">7:15 PM</span></h2>
+    <blockquote>
+      "Make sure everything works with actual API keys and Twitter results, etc. And think
+      about if you are Parth and you're just trying this out for the first time, exactly
+      what you would need to do."
+    </blockquote>
+    <p>
+      Every API integration was verified against current documentation, with the mindset
+      of someone trying this for the first time. The results were mixed:
+    </p>
+    <div class="detail-card">
+      <h3>Verification Results</h3>
+      <ul>
+        <li><strong>Exa:</strong> Correct as written</li>
+        <li><strong>xAI:</strong> Three errors fixed. Grok-3 was deprecated; switched to the
+          Responses API with the <code>x_search</code> tool</li>
+        <li><strong>Seedlist:</strong> Completely wrong. No API key needed; it's a free static JSON endpoint</li>
+        <li><strong>Browserbase:</strong> Auth header documented correctly (<code>X-BB-API-Key</code>)</li>
+      </ul>
+    </div>
+    <p>
+      Two out of four integrations had errors that would have caused silent failures in
+      production.
+    </p>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section section-page-break">
+    <div class="section-number">9</div>
+    <h2>The Meta Example <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">7:25 PM</span></h2>
+    <blockquote>
+      "The default example pitch and company and idea should be kind of tongue-in-cheek but
+      keep it realistic. VC Prepare itself as an idea, as if you were pitching VC Prepare
+      using VC Prepare. I think that would be pretty funny."
+    </blockquote>
+    <p>
+      The default example became VC Prepare pitching itself to Paul Graham. Self-referential,
+      but also a genuine end-to-end test of every pipeline stage. If the tool can analyze its
+      own product for its own target investor, the pipeline works.
+    </p>
+  </div>
+
+  <!-- SECTION 10 -->
+  <div class="section">
+    <div class="section-number">10</div>
+    <h2>Founder Interview Stage <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">7:30 PM</span></h2>
+    <p>
+      A structured interview was added before any research begins. The skill now asks three
+      foundational questions:
+    </p>
+    <ol>
+      <li>What does your company do?</li>
+      <li>What is the company website?</li>
+      <li>What stage are you at, and how much are you raising?</li>
+    </ol>
+    <p>
+      Then one to two targeted follow-ups based on the answers: traction metrics, defensible moat,
+      biggest anticipated objection, or any prior contact with the target investor. Context
+      before research. The skill asks before it acts.
+    </p>
+    <blockquote>
+      "I do not want the examples to be handwritten. They need to be generated as if the
+      skill was used itself."
+    </blockquote>
+    <p>
+      No faking it. The examples are real output from the skill running against real data.
+    </p>
+  </div>
+
+  <!-- SECTION 11 -->
+  <div class="section">
+    <div class="section-number">11</div>
+    <h2>Polish <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">7:35 PM</span></h2>
+    <blockquote>
+      "Make sure to say this was made for Parth. Like, it just seems too much like my idea
+      at the moment."
+    </blockquote>
+    <blockquote>
+      "Write the README as if you were that person trying it for the first time, but don't
+      say that directly."
+    </blockquote>
+    <p>The cleanup covered every surface:</p>
+    <ul>
+      <li>Tweet screenshots embedded in the README for social proof</li>
+      <li>PDF preview image generated from the Paul Graham example</li>
+      <li>README compressed from roughly 130 lines down to 75</li>
+      <li>Renamed to "VC Whisper Prepare" to match Parth's branding exactly</li>
+      <li><code>generate-examples.sh</code> rewritten with detailed pipeline instructions</li>
+    </ul>
+    <p>
+      No features were added. Everything was tightened, trimmed, and aligned. The last 10%
+      of polish is what separates a prototype from something you can hand to someone and
+      feel good about.
+    </p>
+  </div>
+
+  <!-- SECTION 12 -->
+  <div class="section section-page-break">
+    <div class="section-number">12</div>
+    <h2>The Build Log Itself <span style="font-family: Inter, sans-serif; font-size: 0.45em; font-weight: 500; color: #a8a29e; letter-spacing: 0.05em; vertical-align: middle; margin-left: 0.5rem;">7:45 PM</span></h2>
+    <blockquote>
+      "I want an extremely well-formatted, beautiful HTML document that I can print that
+      basically is as close as possible to the words I'm saying, but accounts for the fact
+      it's text-to-speech, so it's choppy. Maybe cleaned up a little bit, maybe summarized
+      a little bit."
+    </blockquote>
+    <blockquote>
+      "Don't be afraid to include my cussing. Just don't make me sound like an idiot. Make sure
+      my words are well formatted. Make sure the general essence of what I'm saying is very
+      well communicated."
+    </blockquote>
+    <p>
+      Toward the end of the session, Conner turned the build process on itself. The document
+      you are reading was produced as part of the same Claude Code session it describes.
+      Voice dictation captured throughout the evening was cleaned, structured, and rendered
+      into this timeline. The constraint was fidelity: preserve the actual words, account for
+      the choppiness of speech-to-text, but do not sanitize or editorialize.
+    </p>
+  </div>
+
+</main>
+
+<footer class="footer">
+  Conner Ruhl, 2026. Session conducted with Claude Code.
+</footer>
+
+</body>
+</html>

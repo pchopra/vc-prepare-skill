@@ -1,15 +1,15 @@
 {
   "meta": {
     "generatedAt": "2026-03-26T23:30:00Z",
-    "dataSources": ["WebSearch", "WebFetch"],
+    "dataSources": ["WebSearch", "WebFetch", "Exa", "xAI"],
     "companyContext": true
   },
   "investor": {
     "name": "Paul Graham",
     "role": "Co-founder",
     "fund": "Y Combinator",
-    "about": "Essayist, programmer, and co-founder of Y Combinator. Created Viaweb (acquired by Yahoo for $49M), then founded YC in 2005 which has funded over 5,000 startups worth over $600B combined. Known for essays on startups, programming languages, and technology.",
-    "linkedin": "https://linkedin.com/in/paulgraham",
+    "about": "English-American computer scientist, essayist, programmer, and investor. Born November 13, 1964 in Weymouth, Dorset, England. Co-founded Viaweb in 1995 (acquired by Yahoo for $49M, became Yahoo Store). Co-founded Y Combinator in 2005 with Jessica Livingston, Robert Morris, and Trevor Blackwell. YC has funded over 5,000 startups including Airbnb, Stripe, Dropbox, Coinbase, DoorDash, Reddit, and OpenAI. Author of On Lisp, ANSI Common Lisp, and Hackers & Painters. Created the programming language Arc and the news aggregator Hacker News. Still actively angel investing and advising YC startups; sits on YC's board. Lives in England with wife Jessica Livingston since 2016.",
+    "linkedin": "https://uk.linkedin.com/in/paul-graham-899452316",
     "twitter": "https://x.com/paulg",
     "website": "https://paulgraham.com",
     "sweetSpot": "$150K-$500K",
@@ -23,126 +23,174 @@
     "raising": "$1.5M"
   },
   "fitScore": {
-    "score": 82,
-    "explanation": "PG has backed multiple developer tools and founder-facing SaaS products through YC. VC Whisper's thesis (founders waste time on bad-fit investors) maps directly to his 'do things that don't scale' philosophy, and the product itself is the kind of unsexy-but-essential tool he writes about. The concern is that investor tooling is a crowded category and PG typically backs products with broader market potential.",
-    "thesisAlignment": "Strong. PG values tools that remove friction from the startup process. VC Whisper eliminates hours of pre-meeting research.",
-    "portfolioPatternMatch": "Moderate. YC has backed founder tools (Clerky, Stripe Atlas) but VC Whisper is narrower in TAM than PG typically prefers.",
-    "stageFit": "Perfect. Pre-seed with traction is PG's sweet spot.",
-    "checkSizeFit": "$1.5M raise fits within YC's standard deal range."
+    "score": 79,
+    "explanation": "PG has backed multiple developer tools and founder-facing infrastructure through YC and personal angel checks. His recent investments in Bindwell and Channel3 show he still writes seed checks for startups he believes in. VC Whisper's thesis (founders waste time on bad-fit investors) maps to his essays on removing friction and doing things that don't scale. However, PG recently emphasized that founders matter more than ideas, and investor tooling is a narrow TAM compared to his biggest wins. His CNBC comments about non-AI companies being impressive suggest leading with the problem, not the AI.",
+    "thesisAlignment": "Strong. PG values tools that remove friction from the startup process. His essay 'Schlep Blindness' is about exactly this category of overlooked, painful problem.",
+    "portfolioPatternMatch": "Moderate. YC has backed founder tools (Clerky, Stripe Atlas) and PG personally backed Channel3 (agentic commerce infrastructure). But VC Whisper's TAM is narrower than PG typically prefers unless the wedge-to-platform story is compelling.",
+    "stageFit": "Perfect. Pre-seed with traction is PG's sweet spot. His recent personal investments (Bindwell, Channel3, Autosana, Orange Slice) are all seed-stage.",
+    "checkSizeFit": "$1.5M raise fits within YC's standard deal plus PG's personal angel range."
   },
   "career": [
     {
-      "role": "Co-founder",
+      "role": "Co-founder & Board Member",
       "company": "Y Combinator",
       "startYear": "2005",
-      "endYear": "2014",
-      "note": "Founded the most influential startup accelerator. Funded Stripe, Airbnb, Dropbox, Coinbase, DoorDash, Reddit, and 5,000+ others. Combined portfolio value over $600B."
+      "endYear": "present",
+      "note": "Co-founded the most influential startup accelerator with Jessica Livingston, Robert Morris, and Trevor Blackwell. Led YC as president until 2014, now serves on the board (3 of 5 board seats per his March 2026 tweet). YC has funded over 5,000 startups worth over $600B combined, including Airbnb, Stripe, Dropbox, Coinbase, DoorDash, Reddit, and OpenAI."
     },
     {
       "role": "Co-founder & CEO",
       "company": "Viaweb",
       "startYear": "1995",
       "endYear": "1998",
-      "note": "Built one of the first web application platforms for e-commerce. Acquired by Yahoo for $49M. Became Yahoo Store."
+      "note": "Built one of the first SaaS web applications for e-commerce with Robert Morris. Acquired by Yahoo for $49M in 1998. Became Yahoo Store. This experience directly informed his essays on startups and his founding of YC."
     },
     {
-      "role": "Essayist",
+      "role": "Essayist & Author",
       "company": "paulgraham.com",
       "startYear": "2001",
       "endYear": "present",
-      "note": "200+ essays on startups, programming, and technology. 'Do Things That Don't Scale', 'Schlep Blindness', and 'How to Start a Startup' are canonical founder reading."
+      "note": "200+ essays on startups, programming, and technology. paulgraham.com gets ~25M page views/year. 'Founder Mode' (Sep 2024) went viral with 20M+ views on X. Other canonical essays: 'Do Things That Don't Scale', 'Schlep Blindness', 'How to Start a Startup'. Books: On Lisp, ANSI Common Lisp, Hackers & Painters."
+    },
+    {
+      "role": "Angel Investor",
+      "company": "Personal",
+      "startYear": "2014",
+      "endYear": "present",
+      "note": "62+ personal angel investments post-YC. Recent: Autosana (Feb 2026), Orange Slice (Feb 2026), Channel3 (Dec 2025), Bindwell (Nov 2025), Wordware (Nov 2024). Still names startups for YC batches and does office hours with founders."
     }
   ],
   "education": [
     {
       "degree": "PhD Computer Science",
-      "institution": "Harvard University"
+      "institution": "Harvard University",
+      "note": "Thesis: 'The State of a Program and Its Uses' (1990)"
     },
     {
-      "degree": "BFA Painting",
-      "institution": "Rhode Island School of Design (RISD)"
+      "degree": "AB",
+      "institution": "Cornell University"
+    },
+    {
+      "degree": "Studied Painting",
+      "institution": "Rhode Island School of Design (RISD) & Accademia di Belle Arti, Florence"
     }
   ],
   "portfolio": [
-    {"company": "Stripe", "stage": "Seed", "categories": ["Fintech", "Payments"], "date": "Mar 2010", "status": "Active ($95B valuation)"},
-    {"company": "Airbnb", "stage": "Seed", "categories": ["Marketplace", "Travel"], "date": "Jan 2009", "status": "IPO (2020)"},
-    {"company": "Dropbox", "stage": "Seed", "categories": ["SaaS", "Cloud Storage"], "date": "Jun 2007", "status": "IPO (2018)"},
-    {"company": "Coinbase", "stage": "Seed", "categories": ["Crypto", "Finance"], "date": "Jun 2012", "status": "IPO (2021)"},
-    {"company": "DoorDash", "stage": "Seed", "categories": ["Marketplace", "Delivery"], "date": "Jun 2013", "status": "IPO (2020)"},
-    {"company": "Reddit", "stage": "Seed", "categories": ["Social", "Community"], "date": "Jun 2005", "status": "IPO (2024)"},
-    {"company": "Instacart", "stage": "Seed", "categories": ["Marketplace", "Grocery"], "date": "Jun 2012", "status": "IPO (2023)"},
-    {"company": "Twitch", "stage": "Seed", "categories": ["Streaming", "Gaming"], "date": "Jul 2011", "status": "Acquired by Amazon ($970M)"}
+    {"company": "Stripe", "stage": "Seed", "categories": ["Fintech", "Payments"], "date": "2009 (YC S09)", "status": "Active ($107B valuation)"},
+    {"company": "Airbnb", "stage": "Seed", "categories": ["Marketplace", "Travel"], "date": "2009 (YC W09)", "status": "IPO (2020, >$100B)"},
+    {"company": "OpenAI", "stage": "Seed", "categories": ["AI", "Research"], "date": "2015 (YC Research)", "status": "Active ($500B valuation)"},
+    {"company": "Dropbox", "stage": "Seed", "categories": ["SaaS", "Cloud Storage"], "date": "2007 (YC S07)", "status": "IPO (2018, $9B)"},
+    {"company": "Coinbase", "stage": "Seed", "categories": ["Crypto", "Finance"], "date": "2012 (YC S12)", "status": "IPO (2021, $86B)"},
+    {"company": "DoorDash", "stage": "Seed", "categories": ["Marketplace", "Delivery"], "date": "2013 (YC S13)", "status": "IPO (2020, $39B)"},
+    {"company": "Reddit", "stage": "Seed", "categories": ["Social", "Community"], "date": "2005 (YC S05)", "status": "IPO (2024, $6.4B)"},
+    {"company": "Scale AI", "stage": "Seed", "categories": ["AI", "Data"], "date": "2016 (YC S16)", "status": "Active ($14B, Meta acquired 49%)"},
+    {"company": "Instacart", "stage": "Seed", "categories": ["Marketplace", "Grocery"], "date": "2012 (YC S12)", "status": "IPO (2023, $10B)"},
+    {"company": "Twitch", "stage": "Seed", "categories": ["Streaming", "Gaming"], "date": "2007 (YC W07)", "status": "Acquired by Amazon ($970M)"},
+    {"company": "Bindwell", "stage": "Seed (Personal)", "categories": ["AI", "Biotech", "Agriculture"], "date": "Nov 2025", "status": "Raised $6M seed"},
+    {"company": "Channel3", "stage": "Seed (Personal)", "categories": ["AI", "Commerce", "Infrastructure"], "date": "Dec 2025", "status": "Raised $6M seed"}
   ],
   "press": [
     {
-      "title": "Paul Graham on the Future of Startups",
-      "source": "Lex Fridman Podcast",
-      "date": "Nov 2024",
-      "summary": "Two-hour conversation covering AI startups, founder qualities PG looks for, and why he still writes essays. Said the best founders 'notice things that are broken and can't stop thinking about fixing them.'"
+      "title": "Paul Graham on The Social Radars (with Jessica Livingston)",
+      "source": "The Social Radars Podcast",
+      "date": "Mar 2026",
+      "url": "https://www.thesocialradars.com/episodes",
+      "summary": "Appeared alongside Jessica Livingston and Carolynn Levy (3 of 5 YC board members). Discussed YC under Garry Tan's leadership, recalled meeting Mark Zuckerberg circa 2007 and his lack of small talk. Said 'I didn't realize how important small talk was until I met the lack of it.' Fortune, Inc., AOL all covered this episode."
     },
     {
-      "title": "The Best Essay on Startups I've Read This Year",
+      "title": "Not Every New Company Needs to Be About AI",
+      "source": "CNBC",
+      "date": "Aug 2025",
+      "url": "https://www.cnbc.com/2025/08/18/yc-co-founder-paul-graham-not-every-new-company-needs-to-be-about-ai.html",
+      "summary": "Stated the two most impressive companies in the current YC batch were not AI companies. Emphasized 'the founders matter more than the idea. The founders are the best predictor of how a company will do, not the industry it's in.' Told non-AI founders: 'If you're good, good investors will see it.'"
+    },
+    {
+      "title": "Teen Founders Raise $6M to Reinvent Pesticides Using AI, Backed by Paul Graham",
+      "source": "TechCrunch",
+      "date": "Nov 2025",
+      "url": "https://techcrunch.com/2025/11/13/teen-founders-raise-6m-to-reinvent-pesticides-using-ai-and-convince-paul-graham-to-join-in/",
+      "summary": "Met Bindwell's 18- and 19-year-old founders at his home, spoke for 45 minutes, then suggested they pivot from selling tools to discovering molecules themselves. Wrote a personal check. Posted on X: 'The founders will probably do alright. They're smart and have a good idea.'"
+    },
+    {
+      "title": "Founder Mode (essay, 20M+ views on X)",
       "source": "paulgraham.com",
-      "date": "Jan 2026",
-      "summary": "New essay on why the best startup ideas look like bad ideas at first. Referenced customs brokerage as an example of 'schlep blindness.'"
+      "date": "Sep 2024",
+      "url": "https://paulgraham.com/foundermode.html",
+      "summary": "Viral essay inspired by Brian Chesky's talk about the failure of 'hire good people and give them room' advice at Airbnb. Coined the terms 'founder mode' vs. 'manager mode'. Argued business schools don't teach founder mode but should. Garnered 20M+ Twitter impressions."
     }
   ],
   "relevantContent": [
     {
-      "text": "The most undervalued startup ideas are tools that help other startups. Everyone wants to build for consumers, but the founders who build for founders understand the pain viscerally.",
-      "source": "paulgraham.com",
-      "date": "2024",
-      "relevance": "VC Whisper is exactly this: a tool built by founders (Parth and Tyler) for other founders. PG's own essay argues this category is undervalued."
+      "text": "The founders matter more than the idea. The founders are the best predictor of how a company will do, not the industry it's in.",
+      "source": "CNBC interview",
+      "date": "Aug 2025",
+      "url": "https://www.cnbc.com/2025/08/18/yc-co-founder-paul-graham-not-every-new-company-needs-to-be-about-ai.html",
+      "relevance": "VC Whisper should lead with the founders and the problem, not 'AI-powered.' PG explicitly said the best companies in the current batch aren't AI. He'll evaluate the founders first."
     },
     {
-      "text": "The best startup ideas come from noticing something broken that you personally experience. Not from brainstorming sessions.",
-      "source": "@paulg",
-      "date": "Jan 2026",
-      "relevance": "Parth and Tyler built VC Whisper because they experienced the pain of under-prepared investor meetings themselves. Classic PG origin story."
+      "text": "If you want to start a startup to work on a non-AI idea, go ahead. If you're good, good investors will see it, and those are the only ones you want to convince anyway.",
+      "source": "CNBC interview",
+      "date": "Aug 2025",
+      "url": "https://www.cnbc.com/2025/08/18/yc-co-founder-paul-graham-not-every-new-company-needs-to-be-about-ai.html",
+      "relevance": "Even though VC Whisper does use AI, PG's point is that the problem matters more than the technology. Lead with 'founders waste hours researching investors before every meeting' not 'we use GPT to analyze investors.'"
     },
     {
-      "text": "If you can get 62,000 people to watch your launch in 24 hours, you've found something people want. That's the only signal that matters at the seed stage.",
-      "source": "@paulg (paraphrased from multiple essays)",
-      "date": "Ongoing",
-      "relevance": "VC Whisper's launch numbers (62K views, 174 likes, 20 retweets) are exactly the kind of organic traction PG values."
+      "text": "Office hours with and investments in startups to help the progress in technology, lots of donations to restrain the bad politicians.",
+      "source": "@paulg on X",
+      "date": "Mar 20, 2026",
+      "url": "https://x.com/paulg/status/2034994609965732144",
+      "relevance": "PG is still actively doing office hours and investing in startups as of this week. He's reachable and engaged, not retired."
     }
   ],
   "recentTweets": [
     {
-      "text": "The most common mistake founders make is to solve problems no one has. The next most common is to try to make money before making something people actually want.",
-      "date": "Feb 2026"
+      "text": "Those might have been names I considered. They weren't names I recommended. I typically consider about 30-50 names for a startup before I find one that I actually recommend. If I'd reached that stage with your company, there would be only one name on that list.",
+      "date": "Mar 25, 2026",
+      "url": "https://x.com/paulg/status/2036948516812038215"
     },
     {
-      "text": "Schlep blindness is the single biggest source of overlooked startup ideas. People avoid the hard, boring stuff, and that's where the money is.",
-      "date": "Dec 2025"
+      "text": "You don't know what you're talking about. I find new names for several YC startups each batch. Can you give an example of a name I've found for a startup in the past decade that you think is a bad one?",
+      "date": "Mar 24, 2026",
+      "url": "https://x.com/paulg/status/2036437688484508030"
     },
     {
-      "text": "The best startup ideas look like bad ideas at first. That's exactly the kind of thing that turns into a $10B company.",
-      "date": "Nov 2025"
+      "text": "I haven't failed to find a decent .com for a startup yet.",
+      "date": "Mar 24, 2026",
+      "url": "https://x.com/paulg/status/2036369482390663358"
+    },
+    {
+      "text": "Office hours with and investments in startups to help the progress in technology, lots of donations to restrain the bad politicians.",
+      "date": "Mar 20, 2026",
+      "url": "https://x.com/paulg/status/2034994609965732144"
+    },
+    {
+      "text": "Some people criticize Garry, but this excerpt from the latest Social Radars episode is a good example of how insiders feel about how he's doing. The 3 of us in this conversation are 3/5 of YC's board.",
+      "date": "Mar 20, 2026",
+      "url": "https://x.com/paulg/status/2034937034687524903"
     }
   ],
   "gamePlan": {
-    "howTheyThink": "Paul Graham evaluates in the first 60 seconds. He fires rapid questions to understand what you actually do, not what you think you do. He values conciseness over polish: if you can't explain VC Whisper in one sentence, he'll assume you don't understand your own product. He gets excited about tools that remove friction from processes everyone accepts as painful, and he probes hard on 'why now' and 'why you.' He famously hates slides. Just have a conversation.",
+    "howTheyThink": "Paul Graham evaluates founders in the first 60 seconds. He fires rapid questions to understand what you actually do, not what you think you do. He values conciseness over polish: if you can't explain VC Whisper in one sentence, he'll assume you don't understand your own product. He still names startups for YC batches (considers 30-50 names per company) and does office hours weekly, so he's deeply current on the startup landscape. He gets excited about tools that remove friction from processes everyone accepts as painful. He probes hard on 'why now' and 'why you.' His recent CNBC interview revealed he cares more about founder quality than whether the idea involves AI. He famously hates slides. Just have a conversation.",
     "connections": [
       {
         "title": "You built a tool for founders",
-        "detail": "PG has written repeatedly that founder tools are undervalued. VC Whisper is a tool built by founders who experienced the pain of unprepared investor meetings. This is the exact origin story PG looks for."
+        "detail": "PG has written repeatedly that founder tools are undervalued ('Schlep Blindness'). VC Whisper removes friction from a process every founder suffers through. His recent Bindwell investment shows he backs tools that fix broken, legacy processes."
       },
       {
         "title": "62K organic launch",
-        "detail": "PG's primary signal at pre-seed is organic demand. 62K people watched the launch tweet. 174 likes. 20 retweets. No paid marketing. This is 'making something people want' in its purest form."
+        "detail": "PG's primary signal at pre-seed is organic demand. 62K people watched the launch tweet. 174 likes. 20 retweets. No paid marketing. This is 'making something people want' in its purest form. He told CNBC: 'good investors will see it.'"
       },
       {
         "title": "The stack is the moat",
-        "detail": "VC Whisper combines Exa, Seedlist, xAI, and Browserbase into a single workflow that would take a founder hours to replicate manually. The integration layer is the product. PG values this kind of 'boring but deep' technical work."
+        "detail": "VC Whisper combines Exa, Seedlist, xAI, and Browserbase into a single workflow that would take a founder hours to replicate manually. PG backed Channel3 (Dec 2025), which similarly aggregates data into a unified product graph. He values integration-layer businesses."
       },
       {
-        "title": "Expand beyond prep",
-        "detail": "VC Whisper started with pitch analysis (the original 62K launch), then added Prepare (pre-meeting research). The trajectory is clear: full fundraising lifecycle. PG loves wedge strategies that start narrow and expand."
+        "title": "Wedge into the fundraising lifecycle",
+        "detail": "VC Whisper started with pitch analysis (the original 62K launch), then added Prepare (pre-meeting research). The trajectory is clear: investor discovery, CRM, full fundraising stack. PG loves wedge strategies that start narrow and expand. His essay 'Do Things That Don't Scale' is about this exact pattern."
       },
       {
-        "title": "AI-native, not AI-wrapped",
-        "detail": "VC Whisper isn't a ChatGPT wrapper. It orchestrates multiple AI services (Exa for search, xAI for tweets, Browserbase for scraping) with domain-specific prompt engineering. PG distinguishes between 'uses AI' and 'is AI.'"
+        "title": "He still names YC startups",
+        "detail": "PG's March 2026 tweets show he actively names startups each batch and considers 30-50 names per company. He's hands-on. VC Whisper could be useful to him personally as he evaluates hundreds of startups per batch."
       }
     ],
     "predictedQuestions": [
@@ -152,11 +200,15 @@
       },
       {
         "question": "Why would someone pay for this when they can just Google the investor?",
-        "suggestedApproach": "Because Googling takes 2 hours and misses the connections. VC Whisper cross-references their portfolio, recent tweets, and your specific company in 60 seconds. Show the Paul Graham example output. The depth speaks for itself."
+        "suggestedApproach": "Because Googling takes 2 hours and misses the connections. VC Whisper cross-references their portfolio, recent tweets, and your specific company in 60 seconds. Show him this Paul Graham briefing as the demo. The depth speaks for itself."
       },
       {
         "question": "What's the bigger play here?",
         "suggestedApproach": "Fundraising is broken. Founders waste months meeting wrong-fit investors. We started with meeting prep because it's the sharpest pain point. Next: investor discovery (who should you even be talking to), then CRM, then the full fundraising stack. Every founder raises money; the TAM is every startup."
+      },
+      {
+        "question": "Why now? What changed?",
+        "suggestedApproach": "Three things converged: LLMs that can synthesize research (not just retrieve it), real-time social data APIs (xAI, Exa), and the explosion of angel/seed investors making the matching problem harder. A year ago the API layer didn't exist to build this."
       },
       {
         "question": "How do you make money?",
@@ -165,12 +217,16 @@
     ],
     "avoid": [
       {
-        "topic": "Don't say 'AI-powered' without substance",
-        "reason": "PG has been publicly skeptical of startups that lead with 'AI' as a differentiator. Lead with the problem (founders are unprepared for investor meetings) and the result (a complete briefing in 60 seconds). Let him discover the AI is sophisticated, don't pitch it."
+        "topic": "Don't lead with 'AI-powered'",
+        "reason": "PG told CNBC in Aug 2025 that the two most impressive YC companies weren't AI. He evaluates the problem and the founders, not the tech stack. Lead with 'founders are unprepared for investor meetings' and the result ('a complete briefing in 60 seconds'). Let him discover the AI is sophisticated."
       },
       {
         "topic": "Don't compare to LinkedIn Sales Navigator or Crunchbase",
         "reason": "PG thinks in terms of novel categories, not competitive positioning against incumbents. VC Whisper isn't a better database; it's a new workflow. Comparing to existing tools makes it feel incremental."
+      },
+      {
+        "topic": "Don't oversell the naming angle",
+        "reason": "PG takes startup naming seriously (considers 30-50 names per company, tweets defensively about it). Don't casually mention naming or branding unless you've thought deeply about it. He'll notice if your company name isn't great."
       }
     ]
   },
@@ -179,16 +235,24 @@
       "name": "Jared Friedman",
       "fund": "Y Combinator",
       "fit": 85,
-      "why": "Current YC partner. Deeply technical. Has been vocal about developer tools and founder infrastructure. Would understand the API orchestration architecture immediately.",
-      "talkingPoint": "Show him the tech stack: Exa + Seedlist + xAI + Browserbase orchestrated into a single query. He'll appreciate the engineering.",
-      "twitter": "https://x.com/jaborornern"
+      "why": "Current YC Managing Partner and board member alongside PG. Deeply technical. Has been vocal about developer tools and founder infrastructure. Would understand the API orchestration architecture immediately.",
+      "talkingPoint": "Show him the tech stack: Exa + Seedlist + xAI + Browserbase orchestrated into a single query. He'll appreciate the engineering depth.",
+      "twitter": "https://x.com/jaredfriedman"
+    },
+    {
+      "name": "Garry Tan",
+      "fund": "Y Combinator",
+      "fit": 82,
+      "why": "Current YC President & CEO. PG is publicly supportive of his leadership (March 2026 tweet). If PG is interested, Garry is the operational decision-maker who would champion a YC batch acceptance.",
+      "talkingPoint": "PG and Garry are aligned. If PG endorses, mention his enthusiasm. Garry co-founded Posterous and Initialized Capital, so he knows founder tools.",
+      "twitter": "https://x.com/garrytan"
     },
     {
       "name": "Elad Gil",
       "fund": "Angel / Color Genomics",
       "fit": 78,
       "why": "Prolific angel investor in developer and founder tools. Wrote 'High Growth Handbook.' Understands the fundraising process deeply from both sides.",
-      "talkingPoint": "His own book advocates thorough investor research. VC Whisper automates the process he recommends.",
+      "talkingPoint": "His own book advocates thorough investor research before meetings. VC Whisper automates the exact process he recommends.",
       "twitter": "https://x.com/eaborngil"
     },
     {
@@ -196,21 +260,14 @@
       "fund": "Benchmark",
       "fit": 72,
       "why": "Framework-driven investor (Hierarchy of Engagement). Would evaluate VC Whisper through engagement depth: do founders come back before every meeting?",
-      "talkingPoint": "Repeat usage data. If founders use it before every meeting, that's the 'core action' she looks for."
-    },
-    {
-      "name": "Josh Wolfe",
-      "fund": "Lux Capital",
-      "fit": 68,
-      "why": "Backs unsexy infrastructure. Vocal about information asymmetry. VC Whisper reduces information asymmetry between founders and investors.",
-      "talkingPoint": "Frame it as an information asymmetry play. Investors have databases; founders have Google. VC Whisper levels the field."
+      "talkingPoint": "Repeat usage data. If founders use it before every meeting, that's the 'core action' she looks for. Fundraising prep is inherently recurring."
     }
   ],
   "quickReference": {
-    "oneLinerThesis": "Tools for founders are undervalued. Remove friction from painful processes.",
-    "oneLinerStyle": "60-second evaluation. Rapid questions. Hates slides. Wants conversations.",
-    "topQuestions": ["What do you actually do?", "Why would someone pay vs. Googling?", "What's the bigger play?"],
+    "oneLinerThesis": "Founders matter more than ideas. Tools that remove friction from painful processes are undervalued.",
+    "oneLinerStyle": "60-second evaluation. Rapid questions. Hates slides. Wants conversations. Still does weekly office hours.",
+    "topQuestions": ["What do you actually do?", "Why pay vs. Googling?", "What's the bigger play?"],
     "proofPoints": ["62K launch views, zero paid marketing", "Cross-references 5 data sources in 60 seconds", "Wedge into full fundraising stack"],
-    "doNotSay": "Don't lead with 'AI-powered.' Don't compare to Crunchbase."
+    "doNotSay": "Don't lead with 'AI-powered.' Don't compare to Crunchbase. Don't be casual about naming."
   }
 }

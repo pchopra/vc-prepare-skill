@@ -25,7 +25,7 @@ git clone https://github.com/pchopra/vc-prepare-skill.git ~/.claude/skills/vc-pr
 Tell Claude Code:
 
 ```
-add skill from vcwhisper.com/api/prepare/skill
+add skill from vcwhisper.com/vc-prepare-skill.md
 ```
 
 ## Usage

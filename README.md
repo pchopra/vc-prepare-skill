@@ -28,6 +28,7 @@ claude skill add --from https://github.com/pchopra/vc-prepare-skill
 /vc-prepare Paul Graham --quick   Quick lookup (no company context)
 /vc-prepare Paul Graham --save    Research + save markdown brief
 /vc-prepare --setup               Add API keys or update company info
+/vc-prepare --update-material     Update company website, deck, or transcripts
 ```
 
 ### First Time
@@ -43,8 +44,9 @@ Run `/vc-prepare example` to see a full briefing instantly. Then the skill asks 
 1. Searches for the investor and confirms identity (LinkedIn, X)
 2. Asks about your company (remembers previous answers)
 3. Researches the investor (30-60 seconds)
-4. Renders the full briefing in your terminal
-5. Offers to save as markdown
+4. Generates a formatted PDF and opens it automatically
+5. Renders the full briefing in your terminal
+6. Asks if you want to update your company material
 
 ### Quick Mode
 
@@ -96,7 +98,7 @@ The skill asks for your company details to personalize the briefing:
 2. Pitch deck file path (optional — reads directly from disk)
 3. Call transcripts or notes (optional)
 
-Your context is saved to `~/.vc-decoder/config.json` and reused across briefings. Update anytime with `/vc-prepare --setup` or say "update" when prompted.
+Your context is saved to `~/.vc-decoder/config.json` and reused across briefings. Update anytime with `/vc-prepare --update-material` or say "update" when prompted at the end of any run.
 
 ## Markdown Export
 
@@ -125,7 +127,10 @@ Company Context ──> Read config or ask questions
 └─────────────────────────────────────────────┘
      |
      v
-Terminal Rendering ──> Markdown Export (optional)
+PDF Generation ──> Open PDF
+     |
+     v
+Terminal Rendering ──> Update Material?
 ```
 
 ## Based On

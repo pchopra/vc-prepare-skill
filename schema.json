@@ -51,10 +51,34 @@
       "properties": {
         "score": { "type": "integer", "minimum": 0, "maximum": 100 },
         "explanation": { "type": "string", "description": "2-3 sentence justification" },
-        "thesisAlignment": { "type": "string" },
-        "portfolioPatternMatch": { "type": "string" },
-        "stageFit": { "type": "string" },
-        "checkSizeFit": { "type": "string" }
+        "thesisAlignment": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "explanation": { "type": "string" }
+          }
+        },
+        "portfolioPatternMatch": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "explanation": { "type": "string" }
+          }
+        },
+        "stageFit": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "explanation": { "type": "string" }
+          }
+        },
+        "checkSizeFit": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "explanation": { "type": "string" }
+          }
+        }
       }
     },
     "career": {

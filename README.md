@@ -1,98 +1,144 @@
-# VC Whisper Prepare
+# VC Prepare
 
 **Know your investor before you walk in.**
 
-By [Parth Chopra](https://x.com/pchopra28) and [Tyler Richards](https://x.com/tylerjrichards). 62K founders watched [VC Whisper](https://vcwhisper.com) launch:
+A [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that generates investor meeting briefings. Profile, portfolio, fit assessment, game plan, predicted questions, and alternative investors — all in your terminal.
 
-[![VC Whisper launch](assets/vc-whisper-launch.png)](https://x.com/pchopra28/status/2024183884221444349)
-
-Then they built [Prepare](https://vcwhisper.com/prepare), the pre-meeting investor briefing tool. This is that, as a [Claude Code skill](https://code.claude.com/docs/en/skills). Same depth, but it reads your pitch deck off disk, searches your email, checks your calendar, and generates a typeset PDF.
+By [Parth Chopra](https://x.com/pchopra28) and [Tyler Richards](https://x.com/tylerjrichards), powered by [VC Whisper](https://vcwhisper.com).
 
 ## Install
 
+**Option A: One command**
+
 ```bash
-claude skill add cruhl/vc-prepare
+claude skill add pchopra/vc-prepare-skill
 ```
 
-Or: `git clone https://github.com/cruhl/vc-prepare.git ~/.claude/skills/vc-prepare`
+**Option B: Git clone**
 
-## Run
+```bash
+git clone https://github.com/pchopra/vc-prepare-skill.git ~/.claude/skills/vc-prepare
+```
+
+**Option C: From vcwhisper.com**
+
+Tell Claude Code:
+
+```
+add skill from vcwhisper.com/vc-prepare
+```
+
+## Usage
+
+```
+/vc-prepare example              See a sample briefing (Paul Graham + Flexport)
+/vc-prepare Paul Graham           Full investor briefing
+/vc-prepare Paul Graham --quick   Quick lookup (no company context)
+/vc-prepare Paul Graham --save    Research + save markdown brief
+/vc-prepare --setup               Add API keys or update company info
+```
+
+### First Time
+
+Run `/vc-prepare example` to see a full briefing instantly. Then the skill asks if you want to set up your company context for personalized briefings.
+
+### Normal Use
+
+```
+/vc-prepare Marc Andreessen
+```
+
+1. Searches for the investor and confirms identity (LinkedIn, X)
+2. Asks about your company (remembers previous answers)
+3. Researches the investor (30-60 seconds)
+4. Renders the full briefing in your terminal
+5. Offers to save as markdown
+
+### Quick Mode
+
+```
+/vc-prepare Marc Andreessen --quick
+```
+
+Profile, career, portfolio, and tweets only. Skips company context questions — no fit score, no connections.
+
+## What You Get
+
+- **Fit Assessment** — Thesis alignment, portfolio pattern, stage fit, check size. Honest scoring with sub-dimension breakdown.
+- **Know Your Investor** — Career path, education, 6-10 portfolio companies, press appearances.
+- **Relevant Tweets** — Their tweets and writing matched to your company.
+- **Game Plan** — Their style. Connection points. Emphasis points. Predicted questions with suggested approaches. All specific to this investor.
+- **Other Investors** — 4-6 similar investors with fit scores and talking points.
+
+## Modes
+
+### Hosted Mode (Default)
+
+Calls the VC Whisper API. Zero API keys needed. Works out of the box.
 
 ```
 /vc-prepare Paul Graham
 ```
 
-The skill asks about your company to tailor the briefing (stage, traction, moat, prior contact). Answer what you want, or say "go" to skip.
+### Local Mode
+
+Everything runs on your machine. Nothing leaves except direct API calls.
 
 ```
-/vc-prepare example
+/vc-prepare --setup
 ```
 
-Runs a built-in demo: VC Whisper pitching itself to Paul Graham using VC Whisper Prepare.
+Then choose "API keys" and add your OpenAI key. Optional: Exa (deeper search), xAI (tweet discovery).
 
-## What You Get
+| Key | Required | What it adds |
+|-----|----------|-------------|
+| `OPENAI_API_KEY` | Yes (for local mode) | Synthesis, analysis, game plan |
+| `EXA_API_KEY` | No | Neural search, LinkedIn enrichment |
+| `XAI_API_KEY` | No | Tweet discovery via Grok |
 
-- <img src="assets/icons/fit-score.svg" width="20" height="20" align="top"> **Fit Score.** Thesis alignment, portfolio pattern, stage fit, check size. Honest.
-- <img src="assets/icons/know-investor.svg" width="20" height="20" align="top"> **Know Your Investor.** Career path, 6-10 portfolio companies, press, podcasts.
-- <img src="assets/icons/relevant-pitch.svg" width="20" height="20" align="top"> **Relevant to Your Pitch.** Their tweets and writing matched to your company.
-- <img src="assets/icons/game-plan.svg" width="20" height="20" align="top"> **Your Game Plan.** How they think. Where you connect. Questions they'll ask (with answers). Things not to say.
-- <img src="assets/icons/other-investors.svg" width="20" height="20" align="top"> **Other Investors.** 3-4 similar investors with fit scores and outreach angles.
-- <img src="assets/icons/quick-ref.svg" width="20" height="20" align="top"> **Quick Reference Card.** Eight lines for your second monitor during the Zoom.
+## Company Context
 
-See the full outputs: [Paul Graham briefing](examples/paul-graham.pdf) · [Parth Chopra / Dazzle briefing](examples/parth-chopra.pdf)
+The skill asks for your company details to personalize the briefing:
 
-## <img src="assets/icons/pdf-output.svg" width="24" height="24" align="top"> PDF
+1. Company website (optional)
+2. Pitch deck file path (optional — reads directly from disk)
+3. Call transcripts or notes (optional)
 
-[![PDF preview](assets/pdf-preview.png)](examples/paul-graham.pdf)
+Your context is saved to `~/.vc-decoder/config.json` and reused across briefings. Update anytime with `/vc-prepare --setup` or say "update" when prompted.
 
-Cormorant Garamond headings. Source Serif body. Cover page. Proper page breaks. [See the full PDF.](examples/paul-graham.pdf) Also available: [CLI output](examples/paul-graham.md) · [Raw JSON](examples/paul-graham.json)
+## Markdown Export
 
-## The Interview
-
-Before researching, the skill asks a few targeted questions to sharpen the briefing:
-
-1. What does your company do?
-2. Company website?
-3. Stage and raise amount?
-
-Then 1-2 follow-ups from: traction metrics, moat/unfair advantage, biggest investor objection, prior contact with this investor. It skips anything already in the conversation or your pitch deck.
-
-## API Keys (Optional)
-
-Works immediately with Claude's built-in web search. Add keys for deeper data:
-
-| Variable | Service | Adds |
-|----------|---------|------|
-| `EXA_API_KEY` | [Exa](https://exa.ai) | Neural search, LinkedIn enrichment |
-| `XAI_API_KEY` | [xAI](https://x.ai) | Tweet discovery via Grok |
-| `BROWSERBASE_API_KEY` | [Browserbase](https://browserbase.com) | Headless browser for blocked pages |
-
-[Seedlist](https://seedlist.com) data is used automatically (free, no key needed).
-
-## Why a Skill
-
-A web app can't read your pitch deck, search your email, check your calendar, or generate a real PDF. This can.
-
-- **Pitch deck off disk.** No upload, no DocSend passcode.
-- **Email context.** Prior threads, warm intros, commitments.
-- **Calendar context.** Other attendees, first call vs. follow-up.
-- **Typeset PDF.** Serif fonts, cover page, page breaks.
-- **Post-meeting.** Follow-up email drafts, calendar events, action items.
-
-## Examples
-
-Two included: [Paul Graham](examples/paul-graham.pdf) (VC Whisper pitching itself to PG) and [Parth Chopra](examples/parth-chopra.pdf) (Dazzle pitching to Parth). JSON, markdown, and PDF for each.
-
-Generate your own:
-
-```bash
-./generate-examples.sh                    # All defaults
-./generate-examples.sh "Marc Andreessen"  # Specific investor
+```
+/vc-prepare Marc Andreessen --save
 ```
 
-## Build Log
+Saves to `~/investor-briefs/marc-andreessen.md`. You can also say "save this" after viewing any briefing.
 
-This skill was built in a single evening via voice-driven Claude Code. The [build log](BUILD-LOG.html) ([PDF](BUILD-LOG.pdf)) captures the full prompting session from start to ship.
+## Architecture
+
+```
+/vc-prepare [name]
+     |
+     v
+Investor Search ──> Confirm identity (LinkedIn, X)
+     |
+     v
+Company Context ──> Read config or ask questions
+     |
+     v
+┌─────────────────────────────────────────────┐
+│  Hosted Mode          │  Local Mode         │
+│  POST /api/prepare    │  Parallel subagents │
+│  (30-60s, zero setup) │  + OpenAI synthesis │
+└─────────────────────────────────────────────┘
+     |
+     v
+Terminal Rendering ──> Markdown Export (optional)
+```
+
+## Based On
+
+Forked from [cruhl/vc-prepare](https://github.com/cruhl/vc-prepare) by [Connor](https://github.com/cruhl). The original skill uses parallel subagents for fully local research with PDF rendering. This fork adds hosted API mode, onboarding, config persistence, fit score breakdown, connection points, and markdown export.
 
 ## License
 

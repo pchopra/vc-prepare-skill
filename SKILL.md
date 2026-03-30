@@ -1,354 +1,390 @@
 ---
 name: vc-prepare
 description: >
-  Investor meeting prep briefing. Researches an investor using parallel
-  subagents and generates a structured JSON briefing (schema.json), then
-  renders it as beautiful CLI output and optionally as a print-ready PDF
-  via render.py. Handles missing data gracefully: every field is optional.
-  Use when preparing for VC meetings, investor calls, pitch practice, or
-  when the user mentions meeting an investor. Also triggers on "prep",
-  "investor research", "who is [investor]", or "meeting with [investor]".
-argument-hint: "[investor-name]"
+  Investor meeting prep briefing. Researches an investor and generates a
+  structured briefing with profile, portfolio, fit assessment, game plan,
+  and alternative investors. Use when the user types /vc-prepare [investor],
+  /vc-prepare example, /vc-prepare --setup, or /vc-prepare --quick [name].
+  Also triggers on "prep me for [investor]", "investor brief for [name]",
+  or "prepare for meeting with [name]".
+argument-hint: "[investor-name | example | --setup | --quick name]"
 ---
 
 # VC Prepare: Investor Meeting Briefing
 
-Research an investor, produce a structured JSON briefing, render it as
-terminal output, and optionally generate a print-ready PDF. The JSON
-schema (`schema.json` in this skill directory) is the single source of
-truth for all output formats. Every field is optional; both the CLI
-renderer and the PDF renderer degrade gracefully when data is missing.
+Research an investor, produce a structured briefing, and render it in the
+terminal. Supports **hosted mode** (calls the VC Decoder API, zero setup)
+and **local mode** (user's own API keys, full privacy). Every section
+degrades gracefully when data is missing.
 
-## Invocation
-
-```
-/vc-prepare Paul Graham
-/vc-prepare example
-```
-
-Or Claude auto-triggers when the user mentions preparing for an investor
-meeting.
-
-## Example Mode
-
-If the argument is `example` or `try with an example`, run the full
-briefing for **Paul Graham** with this company context:
-
-> VC Whisper (vcwhisper.com). AI-powered investor research tool for
-> founders. Paste a pitch transcript or enter an investor name, and get
-> a full briefing: career history, portfolio, relevant tweets, game plan,
-> and predicted questions. Built using Exa, Seedlist, xAI, and
-> Browserbase. 62K people watched the launch on X. Pre-seed, raising $1.5M.
-
-Yes, we're using VC Prepare to prep a pitch for VC Prepare itself.
-
-This demonstrates the complete flow: parallel research, JSON assembly,
-CLI rendering with fit score, and PDF offer.
-
-## Input Gathering
-
-1. **Parse `$ARGUMENTS` for the investor name.** If no name is provided,
-   ask: "Which investor are you meeting with?"
-
-2. **Ask for company context.** This is the most important step for
-   briefing quality. A tailored briefing is 10x more useful than a
-   generic one. Ask:
-
-   > I can generate a general briefing, but the real value is when I
-   > tailor it to your company. Can you share:
-   >
-   > 1. What does your company do? (one line)
-   > 2. Company website (if you have one)
-   > 3. What stage are you at, and how much are you raising?
-   >
-   > I can also read your pitch deck if you point me to the file path.
-   > Or just say "go" and I'll research the investor without tailoring.
-
-   If the user provides context, ask 2-3 quick follow-ups to sharpen
-   the game plan. Choose from these based on what's still unknown:
-
-   > A few more to make the game plan sharp:
-   >
-   > 4. What's your traction? (users, revenue, growth, anything concrete)
-   > 5. What's your moat or unfair advantage?
-   > 6. What's the biggest objection an investor might raise?
-   > 7. Have you talked to this investor or their firm before?
-
-   Don't ask all of them. Skip any that are already answered by
-   conversation context, the pitch deck, or the company website.
-   Two follow-up questions max. Move fast.
-
-   If the user says "go" or provides nothing, generate a general-purpose
-   briefing (no fit score, no "Relevant to Your Pitch" section).
-
-3. **Absorb conversation context.** If the user has already been
-   discussing their startup, has a pitch deck open, or has mentioned
-   their company in this session, use that context automatically. Don't
-   re-ask for information that's already available.
-
-4. **Read local files.** If a pitch deck PDF path is provided, read it
-   with the Read tool. If a DocSend link is provided, WebFetch it (or
-   use Browserbase if available). No upload needed, no file size limits.
-
-5. **Check for prior correspondence.** If Gmail MCP tools are available,
-   search for prior email threads with this investor or their firm.
-   Summarize any existing relationship context (warm intro chains, prior
-   conversations, commitments made). If not available, skip silently.
-
-6. **Check calendar context.** If Google Calendar MCP tools are
-   available, look up the meeting event for additional context: other
-   attendees from the firm (research all of them), meeting notes in the
-   event description, whether this is a first meeting or follow-up. If
-   not available, skip silently.
-
-## API Key Detection
-
-Check for these environment variables using Bash (`echo $VAR_NAME`).
-Each one unlocks richer data for specific sections. **All are optional.**
-The skill works without any of them using only WebSearch and WebFetch.
-
-| Variable | Service | What it enriches |
-|----------|---------|------------------|
-| `EXA_API_KEY` | [Exa](https://exa.ai) | Career path, LinkedIn enrichment, deeper search |
-| `XAI_API_KEY` | [xAI / Grok](https://x.ai) | Tweet discovery, tweet relevance ranking |
-| `BROWSERBASE_API_KEY` | [Browserbase](https://browserbase.com) | Headless browser for blocked pages |
-
-Seedlist (seedlist.com) requires no API key. Its data is free, static JSON
-served from `seedlist.com`. The skill uses it automatically when researching
-portfolio data. Attribution: link back to seedlist.com when showing results.
-
-If any API keys are detected, ask before using them:
-
-> I found API keys for Exa and xAI. Want me to use them for richer
-> data, or stick with web search only?
-
-If the user confirms, report which sources are active:
+## Commands
 
 ```
-Data sources: WebSearch + WebFetch (default)
-  + Exa (career enrichment)
-  + xAI (tweet ranking)
+/vc-prepare example              See a sample briefing (Paul Graham + Flexport)
+/vc-prepare [name]               Full investor briefing
+/vc-prepare [name] --quick       Quick lookup (no company context)
+/vc-prepare [name] --save        Research + save markdown brief
+/vc-prepare --setup              Add API keys or update company info
 ```
 
-If the user declines, proceed with WebSearch + WebFetch only.
+## Argument Parsing
 
-### Exa API (when `EXA_API_KEY` is set)
+Parse `$ARGUMENTS` to determine the command:
+
+- `example` → Example mode (Section 1)
+- `--setup` → Setup mode (Section 8)
+- `--quick [name]` → Quick mode (skip company context, no fit score)
+- `--save [name]` → Full research + auto-save markdown
+- `[name]` → Full briefing (default)
+- Empty → Ask: "Which investor are you meeting with?"
+
+## Section 0: First-Install Welcome
+
+On first invocation (no `~/.vc-decoder/config.json` exists), show:
+
+```
+Welcome to VC Prepare — investor meeting prep in your terminal.
+
+Commands:
+  /vc-prepare example         See a sample briefing (Paul Graham + Flexport)
+  /vc-prepare [name]          Full investor briefing
+  /vc-prepare [name] --quick  Quick lookup (no company context)
+  /vc-prepare [name] --save   Research + save markdown brief
+  /vc-prepare --setup         Add API keys or update company info
+
+Powered by VC Whisper (vcwhisper.com)
+```
+
+Then proceed with whatever command was invoked.
+
+## Section 1: Example Mode
+
+If the argument is `example`, render the cached Paul Graham + Flexport
+briefing instantly. No API call needed — the data is embedded below.
+
+Use the exact rendering format from Section 6 (Terminal Rendering) with
+this data:
+
+**Profile:**
+- Name: Paul Graham
+- Fund: Y Combinator
+- Role: Co-founder
+- About: Computer scientist, essayist, and co-founder of Y Combinator. Created the first web-based application (Viaweb). Known for essays on startups, programming, and technology. Funded companies like Airbnb, Stripe, Dropbox, and Reddit.
+- LinkedIn: https://www.linkedin.com/in/paulgraham/
+- X: https://x.com/paulg
+- Sweet spot: $500K
+
+**Career:**
+- Co-founder, Y Combinator (2005–2014) — funded 2,000+ startups
+- Co-founder & CEO, Viaweb (1995–1998) — acq. by Yahoo for $49M
+- Essayist, paulgraham.com (2001–present)
+
+**Education:** PhD Computer Science, Harvard University
+
+**Portfolio:**
+| Company | Stage | Categories | Date |
+|---------|-------|------------|------|
+| Stripe | Seed | Fintech, Payments | 2010 |
+| Airbnb | Seed | Marketplace, Travel | 2009 |
+| Dropbox | Seed | SaaS, Cloud Storage | 2007 |
+| Reddit | Seed | Social, Community | 2005 |
+| Instacart | Seed | Marketplace, Logistics | 2012 |
+| Twitch | Seed | Media, Streaming | 2007 |
+
+**Fit Assessment: 87%**
+PG has written extensively about startups that look boring but are actually huge ("schlep blindness"). A licensed customs brokerage modernized with software is a textbook PG-thesis company: an unsexy, regulated industry with massive TAM, a founder with 12 years of domain expertise, and a distribution moat (300M shipping manifests).
+
+**Fit Breakdown:**
+- Thesis Alignment: 92% — PG's thesis centers on founders with deep domain expertise building software for unsexy industries — customs brokerage is a textbook match.
+- Portfolio Pattern: 85% — Strong pattern match with Stripe (regulated fintech), Flexport (logistics), and Instacart (operationally heavy) — all YC companies that digitized complex, real-world workflows.
+- Stage Fit: 90% — PG and YC specialize in seed-stage companies with working products and early traction, which matches your current stage perfectly.
+- Check Size Fit: 80% — YC standard deal is $500K for 7%, plus MFN on the $375K safe. Your raise size aligns with YC-backed seed rounds, though PG's personal checks vary.
+
+**Game Plan:**
+- Style: Paul Graham fires rapid questions to understand the core business within 60 seconds. He values conciseness over polish — if you can't explain it simply, he'll assume you don't understand it. He gets visibly excited about unsexy, regulated industries being eaten by software, and he probes hard on "why now" and "why you." Don't present slides — just have a conversation.
+- Emphasis:
+  1. You own the customer list — PG obsesses over distribution advantages. "We have every importer in America in a database" is your strongest hook.
+  2. Regulatory moat as an asset — He's written that the biggest opportunities hide behind things people don't want to deal with. Your customs license is that barrier.
+  3. The "why now" is crisp — The 2007 rule change enabling remote clearance explains both why no one did this before and why it's possible today.
+- Connections:
+  1. YC customs alum — Flexport went through YC in W14 and PG was still actively advising. Mentioning YC signals you're in his tribe.
+  2. Schlep blindness essay — PG's 2012 essay describes exactly what you're doing. Reference it directly.
+  3. Regulatory moat portfolio pattern — Stripe had banking regs, Airbnb had housing laws. Position your customs license as the same playbook.
+- Questions:
+  1. "So what do you actually do?" — PG always opens with this. Try: "We're a licensed customs broker, but instead of fax machines, importers use our web app."
+  2. "Why hasn't anyone done this before?" — Hit three beats: industry is 40 years behind, heavily licensed, and until 2007 you couldn't clear remotely.
+  3. "How do you get customers if they already have brokers?" — Lead with the 300M manifests database — you know who every importer is.
+  4. "What's the bigger play here?" — Customs brokerage is your wedge into the broader logistics stack.
+
+**Recent Tweets:**
+- "The most common mistake founders make is to solve problems no one has." — @paulg, Feb 2026
+- "Schlep blindness is the single biggest source of overlooked startup ideas." — @paulg, Dec 2025
+
+**Relevant Tweets:**
+- "Schlep blindness is the single biggest source of overlooked startup ideas. People avoid the hard, boring stuff — and that's where the money is." — @paulg, Dec 2025
+- "The best startup ideas look like bad ideas at first. Customs brokerage software? That's exactly the kind of thing that turns into a $10B company." — @paulg, Nov 2025
+
+**Press:**
+- "Paul Graham on Why Great Founders Think Differently" — youtube.com, Jan 2026
+- "Y Combinator's Paul Graham: The Art of Fundraising" — theinformation.com, Nov 2025
+
+**Other Investors:**
+| Name | Fund | Fit | Why |
+|------|------|-----|-----|
+| Josh Wolfe | Lux Capital | 78% | Backs unsexy, hard-tech infrastructure plays |
+| Ben Lerer | Lerer Hippeau | 72% | Operator-investor who favors durable value |
+| Miriam Rivera | Ulu Ventures | 68% | Data-driven seed investor |
+| Ali Hamed | CoVenture | 65% | Invests in fintech infrastructure |
+
+After rendering the example, ask:
+
+> "Want to set up your company context for personalized briefings? (30 seconds, everything optional)"
+
+If yes, proceed to company context questions (Section 3).
+
+## Section 2: API Key Detection
+
+Check for environment variables using Bash:
 
 ```bash
-curl -s "https://api.exa.ai/search" \
-  -H "x-api-key: $EXA_API_KEY" \
+echo "EXA:${EXA_API_KEY:+set}" "XAI:${XAI_API_KEY:+set}" "OPENAI:${OPENAI_API_KEY:+set}"
+```
+
+- If `OPENAI_API_KEY` is set, local mode is available
+- `EXA_API_KEY` and `XAI_API_KEY` are optional enrichments for local mode
+- These are only relevant for local mode or `--setup`
+
+## Section 3: Company Context
+
+After confirming the investor (Section 4), gather company context:
+
+**If `~/.vc-decoder/config.json` exists:**
+
+Read the config and show a summary:
+
+> "I have your previous context on file:
+> - Website: {companyWebsite}
+> - Pitch deck: uploaded {updatedAt date}
+> - Transcripts: {count}
+>
+> Use this? Or say 'update' to change anything."
+
+If user says yes → proceed with saved context.
+If user says update → ask which field to change, update config.
+
+**If no config exists:**
+
+Ask via AskUserQuestion:
+
+> "I can generate a general briefing, but the real value is when I tailor
+> it to your company. Can you share:
+>
+> 1. What's your company website? (optional)
+> 2. Do you have a pitch deck? Provide a file path (optional)
+> 3. Any call transcripts or notes from prior meetings? (optional)
+>
+> Or just say 'go' to skip all of this."
+
+Save answers to `~/.vc-decoder/config.json`:
+
+```json
+{
+  "apiUrl": "https://vcwhisper.com",
+  "mode": "hosted",
+  "companyWebsite": "",
+  "pitchDeckText": "",
+  "transcripts": [],
+  "keys": {},
+  "createdAt": "ISO-8601",
+  "updatedAt": "ISO-8601"
+}
+```
+
+If user provides a pitch deck file path:
+1. Read the file with the Read tool
+2. In hosted mode: call `POST {apiUrl}/api/prepare/parse-deck` with `{ pitchDeckBase64: base64_content }` to extract text
+3. In local mode: read the PDF directly and extract text
+4. Store the extracted text in config as `pitchDeckText`
+
+**In `--quick` mode:** Skip company context entirely. No fit score,
+no connections, no "Relevant to Your Pitch" section.
+
+## Section 4: Investor Search and Confirmation
+
+1. Take the investor name from `$ARGUMENTS`
+2. Call the search API:
+
+```bash
+curl -s -X POST "{apiUrl}/api/prepare/search-investors" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "INVESTOR_NAME"}'
+```
+
+Response: `{ results: [{ investor_id, name, fund, stage_focus, linkedin, x_link }] }`
+
+3. **If 1 result:** Show and confirm:
+   > "{Name} — {Fund}
+   > LinkedIn: {linkedin}
+   > X: {x_link}
+   >
+   > Is this the right investor? (y/n)"
+
+4. **If multiple results:** Show numbered list, ask which one.
+
+5. **If 0 results:** Ask:
+   > "No results found for '{name}'. Want to provide their LinkedIn or X handle manually?"
+
+6. User can edit/override LinkedIn and X URLs before confirming.
+
+7. Map fields: `x_link` → `investorTwitter`, `linkedin` → `investorLinkedin`
+
+## Section 5: Research (Hosted Mode)
+
+This is the default mode. No API keys needed.
+
+1. Read config from `~/.vc-decoder/config.json` (if exists)
+2. Show progress: "Researching {investor name}... this usually takes 30-60 seconds."
+3. Call the prepare API:
+
+```bash
+curl -s -X POST "{apiUrl}/api/prepare" \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "'\''Paul Graham'\'' venture capital partner career",
-    "type": "neural",
-    "numResults": 10,
-    "contents": { "text": { "maxCharacters": 2000 } }
+    "investorName": "INVESTOR_NAME",
+    "investorId": "ID_IF_AVAILABLE",
+    "investorLinkedin": "LINKEDIN_URL",
+    "investorTwitter": "TWITTER_URL",
+    "companyWebsite": "WEBSITE_FROM_CONFIG",
+    "pitchDeckText": "TEXT_FROM_CONFIG",
+    "transcripts": ["TRANSCRIPT_TEXTS"]
   }'
 ```
 
-Also query for LinkedIn: same endpoint, query
-`"'Paul Graham' site:linkedin.com/in"`, numResults 3, maxCharacters 3000.
+4. Set timeout to 120 seconds. If exceeded: "Research is taking longer than usual. The API may be under heavy load."
+5. Parse response → render terminal output (Section 6)
 
-### xAI API (when `XAI_API_KEY` is set)
-
-Use the Responses API with the `x_search` tool for tweet discovery:
-
-```bash
-curl -s "https://api.x.ai/v1/responses" \
-  -H "Authorization: Bearer $XAI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "grok-4-1-fast-non-reasoning",
-    "input": [{
-      "role": "user",
-      "content": "Find recent tweets from Paul Graham (@paulg) about startups, investing, technology. Return tweet text, date, and URL for each."
-    }],
-    "tools": [{
-      "type": "x_search",
-      "allowed_x_handles": ["paulg"]
-    }]
-  }'
+Response shape:
+```json
+{
+  "success": true,
+  "knowYourInvestor": {
+    "profile": { "name", "fund", "role", "about", "linkedin", "twitter", "fundSize", "sweetSpot" },
+    "career": [{ "role", "company", "period", "note" }],
+    "education": { "degree", "school" },
+    "investments": [{ "companyName", "description", "stage", "categories", "date", "url", "source", "round" }],
+    "tweets": [{ "text", "url", "date", "author" }],
+    "relevantTweets": [{ "text", "url", "date", "author" }],
+    "press": [{ "title", "url", "source", "date", "snippet" }]
+  },
+  "gamePlan": {
+    "style": "",
+    "overlapScore": 85,
+    "overlapWhy": "",
+    "emphasis": [{ "title", "detail" }],
+    "questions": [{ "question", "detail" }],
+    "connections": [{ "title", "detail" }],
+    "fitBreakdown": {
+      "thesisAlignment": { "score": 90, "explanation": "" },
+      "portfolioPattern": { "score": 85, "explanation": "" },
+      "stageFit": { "score": 80, "explanation": "" },
+      "checkSizeFit": { "score": 75, "explanation": "" }
+    }
+  },
+  "otherInvestors": [{ "name", "fund", "fit", "why", "talkingPoint", "contact" }]
+}
 ```
 
-The response includes `annotations` with `type: "url_citation"` containing
-tweet URLs. The `x_search` tool supports `allowed_x_handles` (max 10),
-`from_date`, and `to_date` parameters.
+## Section 5b: Research (Local Mode)
 
-If company context exists, run a second query without `allowed_x_handles`
-to find tweets from ANY account relevant to the investor + industry.
+Only available when `config.mode === "local"` and `config.keys.openai` is set.
 
-### Seedlist (no API key needed)
+Use Claude Code tools for research:
 
-Seedlist serves free static JSON. No auth, no rate limits. Download and
-filter client-side:
-
-```bash
-# Full investor index (~400KB)
-curl -s "https://seedlist.com/enrichment-index.json" | \
-  python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-matches = [i for i in data if 'paul graham' in i.get('name','').lower()]
-print(json.dumps(matches, indent=2))
-"
-```
-
-Each investor object has: `name`, `slug`, `firm`, `firm_name`, `role`,
-`location`, `stage_focus`, `sector_focus`, `check_size`, `last_active`,
-`thesis_summary`.
-
-Other useful endpoints:
-- `seedlist.com/investor-lookup.json` (slug-keyed O(1) lookup)
-- `seedlist.com/investor-graph.json` (co-investment graph)
-- `seedlist.com/startup-investor-map.json` (startup-to-investor map)
-- `seedlist.com/rounds-feed.json` (500 most recent rounds)
-
-Attribution: link back to seedlist.com when showing results.
-
-### Browserbase (when `BROWSERBASE_API_KEY` is set)
-
-Create a headless browser session for pages that block WebFetch:
-
-```bash
-curl -s -X POST "https://api.browserbase.com/v1/sessions" \
-  -H "Content-Type: application/json" \
-  -H "X-BB-API-Key: $BROWSERBASE_API_KEY" \
-  -d '{}'
-```
-
-Returns a session with `connectUrl` (WebSocket for Playwright). Use for
-LinkedIn profiles, DocSend decks, and other bot-blocked pages. Only invoke
-when WebFetch fails on a URL.
-
-## Research Phase
-
-**CRITICAL: Use the Agent tool to launch 3-4 parallel subagents.**
-Do NOT do all searches sequentially in the main thread. Each subagent
-runs its own cluster of searches and returns structured partial data.
-The main thread assembles the final JSON from all subagent results.
-
-### Subagent Split
+**Launch 3-4 parallel subagents using the Agent tool:**
 
 **Agent 1: Career + LinkedIn + Education**
+- WebSearch: `"{INVESTOR_NAME}" venture capital partner career biography`
+- WebSearch: `"{INVESTOR_NAME}" education university degree`
+- WebFetch: LinkedIn profile, personal website, fund team page
+- Return: career array, education, investor profile fields
 
-Searches:
-- `"{INVESTOR_NAME}" venture capital partner career biography`
-- `"{INVESTOR_NAME}" site:linkedin.com/in`
-- `"{INVESTOR_NAME}" education university degree`
-
-WebFetch the LinkedIn profile, personal website, and fund team page.
-Return: `career` array, `education` array, `investor.about`,
-`investor.role`, `investor.fund`, `investor.linkedin`, `investor.website`.
-
-**Agent 2: Portfolio + Fund Details + Seedlist**
-
-Searches:
-- `"{INVESTOR_NAME}" portfolio investments crunchbase`
-- `"{FUND_NAME}" fund size AUM`
-- `"{INVESTOR_NAME}" notable investments exits`
-- Seedlist API call (if key available)
-
-WebFetch Crunchbase, AngelList, or fund portfolio page.
-Return: `portfolio` array, `investor.fundSize`, `investor.sweetSpot`,
-`investor.stageFocus`.
+**Agent 2: Portfolio + Fund Details**
+- WebSearch: `"{INVESTOR_NAME}" portfolio investments crunchbase`
+- WebSearch: `"{FUND_NAME}" fund size AUM`
+- WebSearch: `"{INVESTOR_NAME}" notable investments exits`
+- WebFetch: Crunchbase, fund portfolio page
+- If `config.keys.exa`: use Exa API for deeper search:
+  ```bash
+  curl -s "https://api.exa.ai/search" \
+    -H "x-api-key: $EXA_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"query": "INVESTOR_NAME venture capital", "type": "neural", "numResults": 10, "contents": {"text": {"maxCharacters": 2000}}}'
+  ```
+- Return: portfolio array, fund details
 
 **Agent 3: Tweets + Press + News**
+- WebSearch: `"{INVESTOR_NAME}" site:x.com OR site:twitter.com`
+- WebSearch: `"{INVESTOR_NAME}" interview podcast panel 2025 OR 2026`
+- If `config.keys.xai`: use xAI Responses API:
+  ```bash
+  curl -s "https://api.x.ai/v1/responses" \
+    -H "Authorization: Bearer $XAI_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"model": "grok-4-1-fast-non-reasoning", "input": [{"role": "user", "content": "Find recent tweets from INVESTOR_NAME about startups, investing. Return tweet text, date, URL."}], "tools": [{"type": "x_search"}]}'
+  ```
+- Return: tweets array, press array
 
-Searches:
-- `"{INVESTOR_NAME}" site:x.com OR site:twitter.com`
-- `"{INVESTOR_NAME}" interview podcast panel 2025 OR 2026`
-- `"{INVESTOR_NAME}" investment thesis blog interview`
-- xAI API call (if key available)
+**Agent 4 (only with company context): Industry Overlap**
+- WebSearch: `"{INVESTOR_NAME}" {INDUSTRY_KEYWORDS}`
+- WebSearch: `"{FUND_NAME}" portfolio {INDUSTRY}`
+- Return: relevant content, connection points
 
-WebFetch the investor's blog/essays and interview transcripts.
-Return: `recentTweets` array, `press` array, `investor.twitter`,
-partial `gamePlan.howTheyThink` notes.
+After subagents complete, the main thread:
+1. Merges all partial data
+2. Synthesizes game plan (style, overlap, emphasis, questions, connections, fitBreakdown) — use OpenAI API:
+   ```bash
+   curl -s "https://api.openai.com/v1/chat/completions" \
+     -H "Authorization: Bearer $OPENAI_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"model": "gpt-4o", "messages": [{"role": "system", "content": "GAME_PLAN_PROMPT"}, {"role": "user", "content": "RESEARCH_DATA + COMPANY_CONTEXT"}]}'
+   ```
+3. Generates other investor recommendations
+4. Renders terminal output (Section 6)
 
-**Agent 4 (only when company context exists): Industry Overlap**
+Sections requiring proprietary data (Seedlist investments, VECK tracking)
+are omitted in local mode.
 
-Searches:
-- `"{INVESTOR_NAME}" {INDUSTRY_KEYWORDS}`
-- `"{FUND_NAME}" portfolio {INDUSTRY}`
-- `"{INVESTOR_NAME}" {COMPANY_DESCRIPTION_KEYWORDS}`
-- `"{INVESTOR_NAME}" anti-portfolio OR "passed on"`
+## Section 6: Terminal Rendering
 
-Return: `relevantContent` array, `gamePlan.avoid` items, raw notes
-for fit score calculation.
+Render the briefing as markdown in the terminal. Follow these rules:
 
-### After Subagents Complete
+**Graceful degradation (non-negotiable):**
+- If a section has no data, show "No data found." under the header.
+- Always show at minimum: investor name/role/fund, game plan, other investors.
+- Fit Score and Connections only appear when company context was provided.
 
-The main thread:
-1. Merges all partial data into a single briefing object
-2. Synthesizes `gamePlan` (howTheyThink, connections, predictedQuestions,
-   avoid) from the combined research
-3. Calculates `fitScore` (if company context exists)
-4. Generates `otherInvestors` recommendations
-5. Builds the `quickReference` card
-6. Writes the complete JSON to disk
-
-## JSON Output
-
-Write the assembled briefing to:
-
-```
-/tmp/vc-prepare-{investor-slug}.json
-```
-
-Where `{investor-slug}` is the investor name lowercased with spaces
-replaced by hyphens (e.g., `paul-graham`).
-
-The JSON must conform to `schema.json` in the skill directory. Key rules:
-
-- **Every field is optional.** Omit fields with no data rather than
-  including empty strings or empty arrays.
-- The only required field is `investor.name`.
-- `fitScore` and `relevantContent` should only be present when company
-  context was provided.
-- `meta.dataSources` should list every source actually used.
-- `meta.companyContext` should be `true` or `false`.
-
-## CLI Output
-
-After writing the JSON, render it as beautiful terminal markdown.
-Read the JSON back and transform it section by section.
-
-### Graceful Degradation Rules
-
-These rules are non-negotiable:
-
-- **If a section has no data, skip it entirely.** Never print "No data
-  available", "Information not found", or empty section headers. Just
-  omit the section.
-- If `career` is empty but `investor.about` exists, show the bio under
-  the investor header instead of a career section.
-- If `recentTweets` is empty, skip the tweets section.
-- If no company context was provided, skip Fit Score and Relevant to
-  Your Pitch entirely.
-- If `education` is empty, skip it. Many successful investors dropped
-  out or have no public education records.
-- If `press` is empty, skip Press & Appearances.
-- If `gamePlan.connections` is empty, skip Where You Connect.
-- **Always show at minimum:** investor name/role/fund, game plan
-  (howTheyThink + predictedQuestions), other investors, quick reference.
-- **Always end with the quick reference card** (compact summary for
-  glancing at during the call).
-
-### Output Structure
+**Format:**
 
 ```markdown
 # {INVESTOR_NAME}
 
-**{Role} . {Fund}**
-[LinkedIn]({url}) . [X]({url})
+**{Role} · {Fund}**
+[LinkedIn]({url}) · [X]({url})
 
-{Fund size} . {Sweet spot} . {Stage focus}
+{Fund size} · {Sweet spot} · {Stage focus}
 
 ---
 
-## {N}% Fit
+## Fit Assessment: {N}%
 
-{2-3 sentence explanation. Honest: a low score with reasoning beats an
-inflated number.}
+{overlapWhy — 2-3 sentences}
+
+| Dimension | Score | Detail |
+|-----------|-------|--------|
+| Thesis Alignment | {X}% | {explanation} |
+| Portfolio Pattern | {X}% | {explanation} |
+| Stage Fit | {X}% | {explanation} |
+| Check Size Fit | {X}% | {explanation} |
 
 ---
 
@@ -356,150 +392,155 @@ inflated number.}
 
 ### Career Path
 
-- **{Role}, {Company}** ({startYear}-{endYear})
+- **{Role}, {Company}** ({period})
   {note}
 
-- **{Degree}** -- {Institution}
+### Education
+
+- **{Degree}** — {Institution}
 
 ### Portfolio Companies
 
-| Company | Stage | Category | Date | Status |
-|---------|-------|----------|------|--------|
-| {Name} | {Seed/A/B} | {categories} | {date} | {status} |
+| Company | Stage | Categories | Date |
+|---------|-------|------------|------|
+| {Name} | {Stage} | {categories} | {date} |
 
 ### Press & Appearances
 
-- **{Title}** -- {Source} ({Date})
-  {summary}
+- **{Title}** — {Source} ({Date})
+  {snippet}
 
 ---
 
-## Relevant to Your Pitch
+## Relevant Tweets
 
 > "{text}"
-> -- {source} . {date}
+> — @{author} · {date}
 
-{relevance explanation}
-
----
-
-## Recent Tweets
-
-> "{text}"
-> -- @{handle} . {date}
+{relevance to your company, if company context exists}
 
 ---
 
 ## Your Game Plan
 
-### How They Think
+### Style
+{style paragraph}
 
-{howTheyThink paragraph}
+### Connections
+- **{title}**
+  {detail}
 
-### Where You Connect
-
+### Emphasis Points
 - **{title}**
   {detail}
 
 ### They'll Probably Ask
-
 - **"{question}?"**
-  {suggestedApproach}
-
-### Don't Say
-
-- **Avoid: {topic}**
-  {reason}
+  {detail}
 
 ---
 
-## Other Investors to Talk To
+## Other Investors to Consider
 
-**{Name}** . {Fund} . {fit}% fit
-{why}
-Lead with: {talkingPoint}
+| Name | Fund | Fit | Why |
+|------|------|-----|-----|
+| {Name} | {Fund} | {fit}% | {why} |
+
+**{Name}** — {Fund} · {fit}% fit
+{talkingPoint}
 
 ---
-
-## Quick Reference Card
-
-**{INVESTOR_NAME}** . {Fund} . {Stage} . {Sweet spot}
-Thesis: {oneLinerThesis}
-Style: {oneLinerStyle}
-Top 3 questions: {topQuestions}
-Your 3 proof points: {proofPoints}
-Don't say: {doNotSay}
 ```
 
-## PDF Output
+## Section 7: Markdown Export
 
-After presenting the CLI briefing, offer:
+Triggered by `--save` flag or when user says "save this" after viewing results.
 
-> "Want a print-ready PDF?"
+**Slug:** lowercase investor name, spaces → hyphens, strip special chars
+(e.g., "Marc Andreessen" → `marc-andreessen`)
 
-If the user says yes:
+**Path:** `~/investor-briefs/{slug}.md`
 
-```bash
-python3 ${CLAUDE_SKILL_DIR}/render.py /tmp/vc-prepare-{slug}.json
+**Create directory** `~/investor-briefs/` if it doesn't exist.
+
+**Overwrite** on collision (same investor = updated brief).
+
+Use the same rendering format as Section 6, with an added header:
+
+```markdown
+# Investor Brief: {name}
+**{role} at {fund}** | Generated {YYYY-MM-DD}
+
+[... same sections as terminal rendering ...]
 ```
 
-This produces `/tmp/vc-prepare-{slug}.pdf` and opens it.
+After saving, confirm: "Saved briefing to ~/investor-briefs/{slug}.md"
 
-If `render.py` is not available or fails, fall back:
+## Section 8: Setup (`/vc-prepare --setup`)
 
-1. Tell the user to open the HTML file in a browser and print to PDF.
-   The HTML template at `${CLAUDE_SKILL_DIR}/templates/briefing.html`
-   has `@media print` CSS that produces clean output.
-2. If no HTML was generated either, the JSON file at
-   `/tmp/vc-prepare-{slug}.json` is the portable artifact.
+Interactive setup for API keys and company info.
 
-## Post-Meeting Follow-Up
+1. Read existing `~/.vc-decoder/config.json` (if exists)
+2. Show current config summary
+3. Ask via AskUserQuestion:
+
+> "What would you like to update?
+>
+> A) Company info (website, pitch deck, transcripts)
+> B) API keys (for local privacy mode)
+> C) API URL (default: https://vcwhisper.com)
+> D) Switch mode (hosted ↔ local)"
+
+**For API keys (option B):**
+
+> "Local mode runs everything on your machine. Required:
+>
+> - OpenAI API key (required for local mode)
+>
+> Optional (enrich results):
+> - Exa API key — deeper search, LinkedIn enrichment
+> - xAI API key — tweet discovery via Grok
+>
+> Paste your OpenAI key (or press enter to skip):"
+
+Save keys to `config.keys.openai`, `config.keys.exa`, `config.keys.xai`.
+If `config.keys.openai` is set, set `config.mode = "local"`.
+
+## Section 9: Error Handling
+
+| Scenario | Response |
+|----------|----------|
+| API unreachable / timeout (>120s) | "Could not reach the VC Decoder API. Check your internet connection." |
+| API returns 500 | "The research service encountered an error. Try again in a minute." |
+| API returns `success: false` | Show the error message from the API |
+| 0 search results | Ask for manual LinkedIn/X URLs |
+| Pitch deck file not found | "File not found at {path}. Check the path and try again." |
+| Pitch deck >10MB | "Pitch deck is too large (>10MB). Try a compressed version." |
+| Config corrupted | Delete `~/.vc-decoder/config.json` and re-onboard |
+| Missing investor name | Ask: "Which investor are you meeting with?" |
+
+## Section 10: Post-Meeting Follow-Up
 
 If the user returns to the conversation after the meeting, offer:
 
-> "How did it go? I can help with:"
+> "How did it go? I can help with:
 > 1. Draft a follow-up email referencing what was discussed
-> 2. Create calendar events for follow-up deadlines
-> 3. Capture action items from the meeting
-
-If Gmail MCP tools are available, draft and save the follow-up email
-directly in Gmail. If Google Calendar MCP tools are available, create
-follow-up events on the user's calendar.
+> 2. Create action items from the meeting
+> 3. Note feedback for your next pitch"
 
 ## Quality Checklist
 
-Before presenting the briefing, silently verify:
+Before presenting any briefing, silently verify:
 
-- Every section has real, verified data (not hallucinated)
-- Career path has actual years and role titles from a real source
-- Portfolio companies are real, verified investments
-- Tweets and quotes have attributed sources and dates
-- Game plan reflects THIS investor's specific style, not generic advice
-- "They'll Probably Ask" questions are specific to this investor's
-  known interests and patterns
-- "Don't Say" items cite specific evidence
+- Every section has real, sourced data (not hallucinated)
+- Career entries have actual years and titles from a real source
+- Portfolio companies are verified investments
+- Tweets have attributed sources and dates
+- Game plan reflects THIS investor's specific style
+- "They'll Probably Ask" questions are specific to this investor
+- Connections cite specific evidence (a shared alma mater, adjacent portfolio company, etc.)
 - Other investors are real people at real, active funds
-- If fit score is included, the reasoning is honest and calibrated
+- Fit score reasoning is honest and calibrated
 - No section is padded with generic filler
-- Quick reference card is genuinely useful for glancing at during a call
 
 Never fabricate portfolio companies, career history, quotes, or tweets.
-
-## Error Handling
-
-- If WebSearch returns no results for a query, try 2-3 alternative
-  phrasings before giving up on that data. Example: if
-  `"Jane Smith" venture capital` fails, try `"Jane Smith" investor`
-  or `"Jane Smith" {fund name}`.
-- If an API key is set but the call fails, fall back to WebSearch and
-  note the fallback briefly in `meta.dataSources`.
-- If the investor is very obscure, say so honestly. Suggest the user
-  provide a LinkedIn URL or fund website to improve results. Still
-  produce whatever briefing is possible with the data found.
-- Never fabricate data to fill gaps. Missing data is better than
-  wrong data.
-- If a WebFetch fails on a URL, try an alternative source rather than
-  skipping the section entirely.
-- If `render.py` fails or is missing, tell the user to open the HTML
-  in a browser and print. The `@media print` CSS produces identical
-  output to the PDF renderer.

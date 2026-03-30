@@ -25,6 +25,7 @@ degrades gracefully when data is missing.
 /vc-prepare [name] --quick       Quick lookup (no company context)
 /vc-prepare [name] --save        Research + save markdown brief
 /vc-prepare --setup              Add API keys or update company info
+/vc-prepare --update-material    Update company website, pitch deck, or transcripts
 ```
 
 ## Argument Parsing
@@ -33,6 +34,7 @@ Parse `$ARGUMENTS` to determine the command:
 
 - `example` → Example mode (Section 1)
 - `--setup` → Setup mode (Section 8)
+- `--update-material` → Update material mode (Section 11)
 - `--quick [name]` → Quick mode (skip company context, no fit score)
 - `--save [name]` → Full research + auto-save markdown
 - `[name]` → Full briefing (default)
@@ -51,6 +53,7 @@ Commands:
   /vc-prepare [name] --quick  Quick lookup (no company context)
   /vc-prepare [name] --save   Research + save markdown brief
   /vc-prepare --setup         Add API keys or update company info
+  /vc-prepare --update-material  Update company website, deck, or transcripts
 
 Powered by VC Whisper (vcwhisper.com)
 ```
@@ -138,7 +141,8 @@ PG has written extensively about startups that look boring but are actually huge
 
 After rendering the example, ask:
 
-> "Want to set up your company context for personalized briefings? (30 seconds, everything optional)"
+> "Want to set up your company context for personalized briefings? (30 seconds, everything optional)
+> Say 'update' or run `/vc-prepare --update-material` anytime."
 
 If yes, proceed to company context questions (Section 3).
 
@@ -354,9 +358,46 @@ After subagents complete, the main thread:
 Sections requiring proprietary data (Seedlist investments, VECK tracking)
 are omitted in local mode.
 
-## Section 6: Terminal Rendering
+## Section 6: PDF Generation + Terminal Rendering
 
-Render the briefing as markdown in the terminal. Follow these rules:
+After research completes, **always generate a PDF first**, then render in terminal.
+
+### Step 1: Generate PDF
+
+1. **Save the briefing data as JSON** to `/tmp/vc-prepare-{slug}.json` using the
+   schema from `schema.json` in this repo. Map the API response fields:
+   - `knowYourInvestor.profile` → `investor`
+   - `knowYourInvestor.career` → `career`
+   - `knowYourInvestor.education` → `education` (wrap in array)
+   - `knowYourInvestor.investments` → `portfolio`
+   - `knowYourInvestor.tweets` → `recentTweets`
+   - `knowYourInvestor.relevantTweets` → `relevantContent`
+   - `knowYourInvestor.press` → `press`
+   - `gamePlan.overlapScore` → `fitScore.score`
+   - `gamePlan.overlapWhy` → `fitScore.explanation`
+   - `gamePlan.fitBreakdown.*` → `fitScore.thesisAlignment`, etc.
+   - `gamePlan` → `gamePlan` (style, connections, emphasis→howTheyThink, questions→predictedQuestions)
+   - `otherInvestors` → `otherInvestors`
+   - Add `meta.generatedAt`, `meta.companyContext` (bool)
+
+2. **Run render.py** (located in the skill's repo directory):
+   ```bash
+   python3 {SKILL_REPO_DIR}/render.py /tmp/vc-prepare-{slug}.json
+   ```
+   This generates `/tmp/vc-prepare-{slug}.html` and `/tmp/vc-prepare-{slug}.pdf`.
+
+3. **Open the PDF immediately:**
+   ```bash
+   open /tmp/vc-prepare-{slug}.pdf
+   ```
+   On Linux use `xdg-open`. If `open` fails (no PDF converter available),
+   fall back to opening the HTML: `open /tmp/vc-prepare-{slug}.html`
+
+4. Tell the user: "PDF opened — here's the briefing:"
+
+### Step 2: Render in Terminal
+
+After opening the PDF, render the same data as markdown in the terminal.
 
 **Graceful degradation (non-negotiable):**
 - If a section has no data, show "No data found." under the header.
@@ -452,6 +493,15 @@ Render the briefing as markdown in the terminal. Follow these rules:
 ---
 ```
 
+### Step 3: End-of-Run Prompt
+
+After every briefing (including example mode), always ask:
+
+> "Want to update your company material (website, pitch deck, transcripts)?
+> Say 'update' or run `/vc-prepare --update-material` anytime."
+
+If user says update → proceed to Section 11 (Update Material).
+
 ## Section 7: Markdown Export
 
 Triggered by `--save` flag or when user says "save this" after viewing results.
@@ -527,6 +577,35 @@ If the user returns to the conversation after the meeting, offer:
 > 1. Draft a follow-up email referencing what was discussed
 > 2. Create action items from the meeting
 > 3. Note feedback for your next pitch"
+
+## Section 11: Update Material (`/vc-prepare --update-material`)
+
+Re-ask the 3 company context questions, pre-filling with current values.
+
+1. Read `~/.vc-decoder/config.json`
+2. Show current values:
+
+> "Current company material:
+> - Website: {companyWebsite or 'not set'}
+> - Pitch deck: {pitchDeckText ? 'uploaded' : 'not set'}
+> - Transcripts: {transcripts.length} saved
+>
+> What would you like to update? (Answer each, or press enter to keep current)"
+
+3. Ask each question individually via AskUserQuestion:
+
+> "Company website? (current: {value}, press enter to keep)"
+
+> "Pitch deck file path? (current: {status}, press enter to keep)"
+
+> "Call transcripts or meeting notes? Paste text or provide a file path. (current: {count} saved, press enter to keep)"
+
+4. If a pitch deck path is provided, process it (same as Section 3):
+   - Read file → call parse-deck API → store extracted text
+
+5. Update `~/.vc-decoder/config.json` with new values, set `updatedAt` to now.
+
+6. Confirm: "Material updated. Your next briefing will use the new context."
 
 ## Quality Checklist
 

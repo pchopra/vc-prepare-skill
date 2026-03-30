@@ -8,24 +8,16 @@ By [Parth Chopra](https://x.com/pchopra28) and [Tyler Richards](https://x.com/ty
 
 ## Install
 
-**Option A: One command**
-
-```bash
-claude skill add pchopra/vc-prepare-skill
-```
-
-**Option B: Git clone**
-
-```bash
-git clone https://github.com/pchopra/vc-prepare-skill.git ~/.claude/skills/vc-prepare
-```
-
-**Option C: From vcwhisper.com**
-
-Tell Claude Code:
+In Claude Code:
 
 ```
 add skill from vcwhisper.com/vc-prepare-skill.md
+```
+
+**Alternative:**
+
+```bash
+claude skill add pchopra/vc-prepare-skill
 ```
 
 ## Usage
